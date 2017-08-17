@@ -93,17 +93,35 @@ class Main_model extends CI_Model {
     return FALSE;
 	}
 
-	public function signup()
-	{
+  public function existingcode($user_type, $code){
+
+    if($user_type == "client"){
+
+      $this->db->where('code', $code);
+
+      if($this->db->count_all_results('permission_code') == 1){
+        return TRUE;
+      }
+    }else if($user_type == "clerk"){
+
+      $this->db->where('code', $code);
+
+      if($this->db->count_all_results('clerk_code') == 1){
+        return TRUE;
+      }
+    }
+
+    return FALSE;
+  }
+
+  public function signup(){
 		$this->load->helper('url');
 
-    if($this->existingclient()){
+    if($this->existingusername()){
       return FALSE;
     }
 
-    $this->db->where('code', $this->input->post('permcode'));
-
-    if($this->db->count_all_results('permission_code') == 0){
+    if(!$this->existingcode("client", $this->input->post('code'))){
       return FALSE;
     }
 
@@ -112,6 +130,9 @@ class Main_model extends CI_Model {
 		$data = array(
 			'client_userName' => $this->input->post('user'),
 			'client_password' => $this->input->post('pass'),
+      'queue_name' => "none",
+      'current' => 0,
+      'display_name' => "none",
 		);
 
 		$this->db->insert('client_info', $data);

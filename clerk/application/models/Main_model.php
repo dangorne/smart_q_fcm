@@ -28,19 +28,37 @@ class Main_model extends CI_Model {
     return FALSE;
   }
 
+  public function existingcode($user_type, $code){
+
+    if($user_type == "client"){
+
+      $this->db->where('code', $code);
+
+      if($this->db->count_all_results('permission_code') == 1){
+        return TRUE;
+      }
+    }else if($user_type == "clerk"){
+
+      $this->db->where('code', $code);
+
+      if($this->db->count_all_results('clerk_code') == 1){
+        return TRUE;
+      }
+    }
+
+    return FALSE;
+  }
+
 	public function signup(){
 		$this->load->helper('url');
 
     if($this->existingusername()){
       return FALSE;
     }
-echo print_r("heeey guyzo");
-    $this->db->where('code', $this->input->post('code'));
 
-    if($this->db->count_all_results('clerk_code') == 0){
+    if(!$this->existingcode("clerk", $this->input->post('code'))){
       return FALSE;
     }
-    echo print_r("heeey guys2");
 
     $this->db->reset_query();
 

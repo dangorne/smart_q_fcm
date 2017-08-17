@@ -8,43 +8,112 @@
 
         <div class="panel-body">
 
-          <?php echo validation_errors() ?>
-
-          <?php echo form_open('signup_subscriber') ?>
+          <?php echo form_open('signup') ?>
 
             <?php
-             echo '<div class="form-group">';
-             echo '<label class="control-label" for="user">Username</label>';
-             echo '<input type="text" name="user" id="user" class="form-control" value = "'.set_value('user').'" aria-describedby="help">';
-             echo '</div>';
+                if($this->session->userdata('USER_EXIST') == 'TRUE'){
+                  echo '<div class="alert alert-danger" role="alert"><strong>Username already exist.</strong></div>';
+                }
+                if($this->session->userdata('PASS_NOT_MATCH') == 'TRUE'){
+                  echo '<div class="alert alert-danger" role="alert"><strong>Password does not match.</strong></div>';
+                }
+                if($this->session->userdata('TERM_NOT_CHECK') == 'TRUE'){
+                  echo '<div class="alert alert-danger" role="alert"><strong>You must agree to the Terms and Policy.</strong></div>';
+                }
+              ?>
+
+            <?php
+
+             if($this->session->userdata('SYNTAX_ERROR') == 'TRUE' && form_error('user') != ''){
+
+               echo '<div class="form-group has-error">';
+               echo '<label class="control-label" for="user">Username</label>';
+               echo '<input type="text" name="user" id="user" class="form-control" value = "'.set_value('user').'" aria-describedby="help">';
+               echo '<span id="help" class="help-block">'.form_error('user').'</span>';
+               echo '</div>';
+             }else{
+
+               echo '<div class="form-group">';
+               echo '<label class="control-label" for="user">Username</label>';
+               echo '<input type="text" name="user" id="user" class="form-control" value = "'.set_value('user').'" aria-describedby="help">';
+               echo '</div>';
+             }
             ?>
 
             <?php
-             echo '<div class="form-group">';
-             echo '<label class="control-label" for="pass">Password</label>';
-             echo '<input type="password" name="pass" id="pass" class="form-control" value = "'.set_value('pass').'" aria-describedby="help">';
-             echo '</div>';
+
+             if($this->session->userdata('SYNTAX_ERROR') == 'TRUE' && form_error('pass') != ''){
+
+               echo '<div class="form-group has-error">';
+               echo '<label class="control-label" for="pass">Password</label>';
+               echo '<input type="password" name="pass" id="pass" class="form-control" value = "'.set_value('pass').'" aria-describedby="help">';
+               echo '<span id="help" class="help-block">'.form_error('pass').'</span>';
+               echo '</div>';
+             }else{
+
+               echo '<div class="form-group">';
+               echo '<label class="control-label" for="pass">Password</label>';
+               echo '<input type="password" name="pass" id="pass" class="form-control" value = "'.set_value('pass').'" aria-describedby="help">';
+               echo '</div>';
+             }
             ?>
 
             <?php
-             echo '<div class="form-group">';
-             echo '<label class="control-label" for="confirmpass">Confirm Password</label>';
-             echo '<input type="password" name="confirmpass" id="confirmpass" class="form-control" value = "'.set_value('confirmpass').'" aria-describedby="help">';
-             echo '</div>';
+
+             if($this->session->userdata('SYNTAX_ERROR') == 'TRUE' && form_error('confirmpass') != ''){
+
+               echo '<div class="form-group has-error">';
+               echo '<label class="control-label" for="confirmpass">Confirm Password</label>';
+               echo '<input type="password" name="confirmpass" id="confirmpass" class="form-control" value = "'.set_value('confirmpass').'" aria-describedby="help">';
+               echo '<span id="help" class="help-block">'.form_error('confirmpass').'</span>';
+               echo '</div>';
+             }else{
+
+               echo '<div class="form-group">';
+               echo '<label class="control-label" for="confirmpass">Confirm Password</label>';
+               echo '<input type="password" name="confirmpass" id="confirmpass" class="form-control" value = "'.set_value('confirmpass').'" aria-describedby="help">';
+               echo '</div>';
+             }
             ?>
 
             <?php
-             echo '<div class="form-group">';
-             echo '<label class="control-label" for="idnum">ID Num</label>';
-             echo '<input type="text" name="idnum" id="idnum" class="form-control" value = "'.set_value('idnum').'" aria-describedby="help">';
-             echo '</div>';
+
+             if($this->session->userdata('SYNTAX_ERROR') == 'TRUE' && form_error('idnum') != ''){
+
+               echo '<div class="form-group has-error">';
+               echo '<label class="control-label" for="idnum">ID Number</label>';
+               echo '<input type="text" name="idnum" id="idnum" class="form-control" value = "'.set_value('idnum').'" aria-describedby="help">';
+               echo '<span id="help" class="help-block">'.form_error('idnum').'</span>';
+               echo '</div>';
+             }else{
+
+               echo '<div class="form-group">';
+               echo '<label class="control-label" for="idnum">ID Number</label>';
+               echo '<input type="text" name="idnum" id="idnum" class="form-control" value = "'.set_value('idnum').'" aria-describedby="help">';
+               echo '</div>';
+             }
             ?>
 
             <?php
-             echo '<div class="form-group">';
-             echo '<label class="control-label" for="phonenum">Phone Number</label>';
-             echo '<input type="text" name="phonenum" id="phonenum" class="form-control" value = "'.set_value('phonenum').'" aria-describedby="help">';
-             echo '</div>';
+
+             if($this->session->userdata('SYNTAX_ERROR') == 'TRUE' && form_error('phonenum') != ''){
+
+               echo '<div class="form-group has-error">';
+               echo '<label class="control-label" for="phonenum">Phone Number</label>';
+               echo '<div class="input-group">';
+               echo '<span class="input-group-addon">+63</span><input type="text" name="phonenum" id="phonenum" class="form-control" value = "'.set_value('phonenum').'" aria-describedby="help">';
+               echo '</div>';
+               echo '<span id="help" class="help-block">'.form_error('phonenum').'</span>';
+               echo '</div>';
+             }else{
+
+               echo '<div class="form-group">';
+               echo '<label class="control-label" for="phonenum">Phone Number</label>';
+               echo '<div class="input-group">';
+               echo '<span class="input-group-addon">+639</span><input type="text" name="phonenum" id="phonenum" class="form-control" value = "'.set_value('phonenum').'" aria-describedby="help">';
+               echo '</div>';
+               echo '</div>';
+             }
             ?>
 
             <label class="control-label" for="college">College</label>
@@ -55,13 +124,15 @@
               <option value="CEIT" <?php echo  set_select('college', 'CEIT') ?> >CEIT</option>
             </select>
 
+          </br>
 
-            <div class="checkbox">
+            <div class="checkbox form-group">
               <label><input type="checkbox" name="term" value="accept" <?php echo set_checkbox('term', 'accept'); ?>>I agree to the Terms of Use and Privacy Policy</label>
-
             </div>
 
-           <?php echo form_submit('submit', 'Sign Up') ?>
+          </br>
+
+           <button type="submit" class="btn btn-info">Sign Up</button>
            <?php echo form_close() ?>
 
         </div>

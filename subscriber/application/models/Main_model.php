@@ -40,30 +40,25 @@ class Main_model extends CI_Model {
     return FALSE;
 	}
 
-	public function register()
-	{
+  public function signup(){
+
 		$this->load->helper('url');
 
-    if($this->existingClient()){
-      return FALSE;
-    }
-
-    $this->db->where('code', $this->input->post('permcode'));
-
-    if($this->db->count_all_results('permission_code') == 0){
+    if($this->existingusername()){
       return FALSE;
     }
 
     $this->db->reset_query();
 
 		$data = array(
-      'client_id' => $this->input->post('clientid'),
-			'client_userName' => $this->input->post('user'),
-			'client_password' => $this->input->post('pass'),
-      'office' => $this->input->post('office'),
+      'id_number' => $this->input->post('idnum'),
+			'userName' => $this->input->post('user'),
+			'password' => $this->input->post('pass'),
+      'cell_number' => $this->input->post('phonenum'),
+      'subscriber_college' => $this->input->post('college'),
 		);
 
-		$this->db->insert('client_info', $data);
+		$this->db->insert('subscriber', $data);
 
     return TRUE;
 	}
@@ -245,6 +240,21 @@ class Main_model extends CI_Model {
     $this->db->update('queuer');
 
     return "LEFT";
+  }
+
+  public function fetchsubdetail(){
+
+    $this->db->where('userName', $this->session->userdata['username']);
+    return $this->db->get('subscriber')->row();
+  }
+
+  public function savesubdetail($phonenum, $college){
+
+    $this->db->where('userName', $this->session->userdata['username']);
+
+    $this->db->set('cell_number', $phonenum);
+    $this->db->set('subscriber_college', $college);
+    $this->db->update('subscriber');
   }
 
 }

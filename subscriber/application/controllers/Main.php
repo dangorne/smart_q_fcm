@@ -20,7 +20,7 @@
         redirect('login');
       }
     }
-    
+
     public function logout(){
 
       if($this->session->userdata('username') != ''){
@@ -78,7 +78,7 @@
       $this->load->helper('form');
       $this->load->library('form_validation');
 
-		  if ($this->form_validation->run('syntax')){
+		  if ($this->form_validation->run('syntax_login')){
 
         if ($this->main_model->existingusername()){
 
@@ -123,53 +123,56 @@
     public function signup_validated(){
 
       $this->load->helper('form');
-			$this->load->library('form_validation');
+      $this->load->library('form_validation');
 
-      //all form validation except the checkbox
-      $this->form_validation->set_rules('id', ' ID', 'required');
-			$this->form_validation->set_rules('user', 'User', 'required');
-			$this->form_validation->set_rules('pass', 'Pass', 'required');
-      $this->form_validation->set_rules('office', 'Office', 'required');
-      // $this->form_validation->set_rules('qname', 'Queue', 'required');
-      $this->form_validation->set_rules('permcode', 'Permission Code', 'required');
+      if ($this->form_validation->run('syntax_signup')){
 
-      //check if user is unregistered
-      //login the user if success
-			if ($this->form_validation->run()){
+       $this->session->unset_userdata('SYNTAX_ERROR');
 
-        //check if  does not exists
-        if(!$this->main_model->existingClient()){
+       if($this->input->post('pass') != $this->input->post('confirmpass')){
 
-          //register user
-          if($this->main_model->register()){
-            //set user session with username
-            //the actual login
-            $userdata = array(
-              'username' => $this->input->post('user')
-            );
-            $this->session->set_userdata($userdata);
-
-            //after login redirect to homepage
-    				redirect(base_url(). '');
-          }else{
-
-            $this->signup();
-
-          }
-        }else{
-
-         //go back to same page and
-         //alert user that username already exists
-         //only username must be checked for existingClient
-         //no need for password
+         $this->session->set_flashdata('PASS_NOT_MATCH', 'TRUE');
          $this->signup();
+         return;
+       }
 
-  			}
-			}else{
+       if($this->input->post('term') != "accept"){
 
-        //user or pass is invalid
-        // redirect(base_url(). 'login');
+         $this->session->set_flashdata('TERM_NOT_CHECK', 'TRUE');
+         $this->signup();
+         return;
+       }
+
+       $this->session->unset_userdata('PASS_NOT_MATCH');
+       $this->session->unset_userdata('TERM_NOT_CHECK');
+
+       if(!$this->main_model->existingusername()){
+
+         $this->session->unset_userdata('USER_EXIST');
+
+         if($this->main_model->signup()){
+
+           $userdata = array(
+             'username' => $this->input->post('user')
+           );
+           $this->session->set_userdata($userdata);
+
+           redirect(base_url(). '');
+         }else{
+
+           $this->signup();
+         }
+       }else{
+
+        $this->session->set_flashdata('USER_EXIST', 'TRUE');
         $this->signup();
+        return;
+
+       }
+      }else{
+
+       $this->session->set_flashdata('SYNTAX_ERROR', 'TRUE');
+       $this->signup();
       }
     }
   }

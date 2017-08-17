@@ -15,6 +15,35 @@
     var panel_toggle
     var fetchpanel
 
+    $('#editSubscriber').click(function(){
+
+      $.ajax({
+         url: "<?php echo site_url('fetchsubdetail'); ?>",
+         method: "GET",
+         dataType: "json",
+         success:function(data){
+           $('#edit-phonenum').val(data['phonenum']);
+           $('#edit-college').val(data['college']);
+         },
+         error:function(){
+           alert("ajax error");
+         },
+       });
+    });
+
+    $('#saveEdit').click(function(){
+
+      $.ajax({
+         url: "<?php echo site_url('savesubdetail'); ?>",
+         method: "POST",
+         data: {phonenum:$('#edit-phonenum').val(), college:$('#edit-college').val()},
+         success:function(data){},
+         error:function(){
+           alert("ajax error");
+         },
+       });
+    });
+
    var init = function(){
      $('.text-title').html("No Queue Selected");
      $('.text-status').html("");
@@ -32,7 +61,7 @@
    var fetchlist = function(){
       $.ajax({
        url: "<?php echo site_url('fetchlist'); ?>",
-       method: "POST",
+       method: "GET",
        dataType: "text",
        success:function(data){
          $('.list-group-class').html(data);
@@ -63,7 +92,7 @@
      if(txt == ''){
        $.ajax({
          url: "<?php echo site_url('fetchtable'); ?>",
-         method: "POST",
+         method: "GET",
          dataType: "text",
          success:function(data){
            $('#q-tbl-body').html(data);

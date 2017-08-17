@@ -11,6 +11,18 @@
       $this->load->helper('url_helper');
     }
 
+    public function fetchsubdetail(){
+
+      $result = $this->main_model->fetchsubdetail();
+
+      echo json_encode(array('phonenum' => $result->cell_number, 'college' => $result->subscriber_college));
+    }
+
+    public function savesubdetail(){
+
+      $this->main_model->savesubdetail($this->input->post('phonenum'), $this->input->post('college'));
+    }
+
     public function fetchtable(){
 
       $var = $this->input->post('search');

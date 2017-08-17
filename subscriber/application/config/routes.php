@@ -10,6 +10,8 @@ $route['leave'] = 'asynch/leave';
 $route['fetchtable'] = 'asynch/fetchtable';
 $route['fetchpanel'] = 'asynch/fetchpanel';
 $route['fetchlist'] = 'asynch/fetchlist';
+$route['fetchsubdetail'] = 'asynch/fetchsubdetail';
+$route['savesubdetail'] = 'asynch/savesubdetail';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST'){
 

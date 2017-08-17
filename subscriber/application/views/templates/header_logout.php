@@ -15,8 +15,11 @@
 	    </div>
 
 	    <ul class="nav navbar-nav navbar-right">
+
 				<a class="navbar-brand glyphicon glyphicon-user" href="<?php echo site_url(''); ?>"> <?php echo $this->session->userdata['username']; ?></a>
-	      <li><a href="<?php echo site_url('logout'); ?>"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+
+				<li><a href="#" id="editSubscriber" data-toggle="modal" data-target="#editModal"><span class="glyphicon glyphicon-edit"></span> Edit</a></li>
+				<li><a href="<?php echo site_url('logout'); ?>"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
 	    </ul>
 	  </div>
 	</nav>

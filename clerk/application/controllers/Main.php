@@ -131,9 +131,9 @@
     public function signup_validated(){
 
       $this->load->helper('form');
-			$this->load->library('form_validation');
+      $this->load->library('form_validation');
 
-			if ($this->form_validation->run('syntax_signup')){
+      if ($this->form_validation->run('syntax_signup')){
 
         $this->session->unset_userdata('SYNTAX_ERROR');
 
@@ -144,7 +144,14 @@
           return;
         }
 
-        $this->session->unset_userdata('PASS_NOT_MATCHED');
+        if(!$this->main_model->existingcode("clerk", $this->input->post('code'))){
+
+          $this->session->set_flashdata('CODE_NOT_EXIST', 'TRUE');
+          $this->signup();
+          return;
+        }
+
+        $this->session->unset_userdata('PASS_NOT_MATCH');
 
         if(!$this->main_model->existingusername()){
 
@@ -157,7 +164,7 @@
             );
             $this->session->set_userdata($userdata);
 
-    				redirect(base_url(). '');
+            redirect(base_url(). '');
           }else{
 
             $this->signup();
@@ -168,8 +175,8 @@
          $this->signup();
          return;
 
-  			}
-			}else{
+        }
+      }else{
 
         $this->session->set_flashdata('SYNTAX_ERROR', 'TRUE');
         $this->signup();
