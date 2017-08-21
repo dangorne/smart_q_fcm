@@ -26,6 +26,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 // $config['base_url'] = 'http://192.168.5.61/clerk';
 $config['base_url'] = 'http://localhost/clerk';
 // $config['base_url'] = 'http://192.168.1.13/clerk';
+//$config['base_url'] = 'http://192.168.43.99/clerk';
 
 /*
 |--------------------------------------------------------------------------
@@ -381,7 +382,7 @@ $config['encryption_key'] = 'F2FEC37123298584583ACE5C529F3';
 */
 $config['sess_driver'] = 'database';
 $config['sess_cookie_name'] = 'ci_session_kiosk';
-$config['sess_expiration'] = 7200;
+$config['sess_expiration'] = 86400;
 $config['sess_save_path'] = 'ci_session_kiosk';
 $config['sess_match_ip'] = FALSE;
 $config['sess_time_to_update'] = 300;

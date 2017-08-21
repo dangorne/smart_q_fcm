@@ -142,17 +142,6 @@
             </div>
           </div>
 
-          </br>
-
-          <div class="btn-group btn-group-lg btn-group-justified" role="group">
-            <div class="btn-group" role="group">
-            <button type="button" class="btn btn-info btn-close" >
-                <span class="glyphicon glyphicon-alert"></span>
-                Close
-              </button>
-            </div>
-          </div>
-
         </br>
 
         <div class="btn-group btn-group-lg btn-group-justified" role="group">
@@ -197,8 +186,58 @@
           </div>
 
         </div>
-
       </div>
+
+      <div class="panel panel-default window-panel" style="display:none;">
+
+        <div class="panel-body">
+
+          </br>
+
+          <div class="btn-group btn-group-justified" role="group">
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-success btn-resume" >
+                <span class="glyphicon glyphicon-play"></span>
+                Continue
+              </button>
+            </div>
+          </div>
+
+          </br>
+
+          <div class="btn-group btn-group-lg btn-group-justified" role="group">
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-warning btn-pause" >
+                <span class="glyphicon glyphicon-pause btn-pause-glyph"></span>
+                Pause
+              </button>
+            </div>
+          </div>
+
+        </br>
+
+          <div class="btn-group btn-group-lg btn-group-justified" role="group">
+            <div class="btn-group" role="group">
+            <button type="button" class="btn btn-danger btn-close" >
+                <span class="glyphicon glyphicon-alert"></span>
+                Close
+              </button>
+            </div>
+          </div>
+
+        </br>
+
+        <div class="btn-group btn-group-lg btn-group-justified" role="group">
+          <div class="btn-group" role="group">
+          <button type="button" class="btn btn-info btn-reset" >
+              <span class="glyphicon glyphicon-refresh"></span>
+              Reset
+            </button>
+          </div>
+        </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>

@@ -1,4 +1,3 @@
-
 <script type="text/javascript" language="javascript">
 
 $(document).ajaxStart(function() {
@@ -12,6 +11,7 @@ $(document).ready(function(){
   var create_input = {};
   var selected_list
 
+  //ok
   function editdetail(type, $newinput, $currtext){
 
     $.ajax({
@@ -20,7 +20,9 @@ $(document).ready(function(){
       data: {type:type, content:$newinput.val()},
       dataType: "json",
       success:function(data){
-        $currtext.text($newinput.val());
+        if(data['success']){
+          $currtext.text($newinput.val());
+        }
       },
       error:function(){
        alert("ajax errorx");
@@ -28,11 +30,29 @@ $(document).ready(function(){
     });
   }
 
+  //ok
+  function fetchdisplay(){
+
+    $.ajax({
+      url: "<?php echo site_url('fetchdisplay'); ?>",
+      method: "POST",
+      data: {content:$('#new-display').val()},
+      dataType: "text",
+      success:function(data){
+        $('#display-name').text(data);
+      },
+      error:function(){
+       alert("ajax errorx");
+      },
+    });
+  }
+  //ok
   $('#editDisplay').click(function(){
 
     $('#new-display').val($('#display-name').text());
   });
 
+  //ok
   $('#save-display').click(function(){
 
     $.ajax({
@@ -41,7 +61,10 @@ $(document).ready(function(){
       data: {content:$('#new-display').val()},
       dataType: "json",
       success:function(data){
-        $('#display-name').text($('#new-display').val());
+        if(data['success']){
+          fetchdisplay();
+        }
+
       },
       error:function(){
        alert("ajax errorx");
@@ -49,78 +72,92 @@ $(document).ready(function(){
     });
   });
 
+  //ok
   $('#editSeats').click(function(){
 
     $('#new-seats').val($('#detail-seats').text());
   });
 
+  //ok
   $('#save-seats').click(function(){
 
-    editdetail("seat", $('#new-seats'), $('#detail-seats'));
+    editdetail('seats_offered', $('#new-seats'), $('#detail-seats'));
   });
 
+  //ok
   $('#editDesc').click(function(){
 
     $('#new-desc').val($('#detail-desc').text());
   });
 
+  //ok
   $('#save-desc').click(function(){
 
-    editdetail("desc", $('#new-desc'), $('#detail-desc'));
+    editdetail('queue_description', $('#new-desc'), $('#detail-desc'));
   });
 
+  //ok
   $('#editReq').click(function(){
 
     $('#new-req').val($('#detail-req').text());
   });
 
+  //ok
   $('#save-req').click(function(){
 
-    editdetail("req", $('#new-req'), $('#detail-req'));
+    editdetail('requirements', $('#new-req'), $('#detail-req'));
   });
 
+  //ok
   $('#editVenue').click(function(){
 
     $('#new-venue').val($('#detail-venue').text());
   });
 
+  //ok
   $('#save-venue').click(function(){
 
-    editdetail("venue", $('#new-venue'), $('#detail-venue'));
+    editdetail('venue', $('#new-venue'), $('#detail-venue'));
   });
 
+  //ok
   $('#editRest').click(function(){
 
     $('#new-rest').val($('#detail-rest').text());
 
   });
 
+  //ok
   $('#save-rest').click(function(){
 
-    editdetail("rest", $('#new-rest'), $('#detail-rest'));
+    editdetail('queue_restriction', $('#new-rest'), $('#detail-rest'));
   });
 
-  var fetchlist = function(){
+  //ok
+  function fetchlist(){
 
     $.ajax({
      url: "<?php echo site_url('fetchlist'); ?>",
      method: "GET",
      dataType: "text",
      success:function(data){
-       $('.list-group-class').html(data);
 
-       var listGroup = $(".list-group-class .list-qname").filter(function() {
-           return $(this).text() == selected_list;
-       }).closest(".list-group-item");
+       if(data != ''){
+         $('.list-group-class').html(data);
 
-       if(listGroup.find('.list-qname').text() != ''){
+         var listGroup = $(".list-group-class .list-qname").filter(function() {
+             return $(this).text() == selected_list;
+         }).closest(".list-group-item");
 
-         listGroup.addClass('list-group-item-success');
-       }else{
-         selected_list = null;
+         if(listGroup.find('.list-qname').text() != ''){
+
+           listGroup.addClass('list-group-item-success');
+         }else{
+           selected_list = null;
+         }
+
+          $('.panel-qlist').show();
        }
-
-       $('.panel-qlist').show();
      },
      error:function(){
        alert("ajax error");
@@ -128,32 +165,36 @@ $(document).ready(function(){
    });
   }
 
-  var status = function(){
+  //ok
+  function status(){
     $.ajax({
       url: "<?php echo site_url('status'); ?>",
       method: "GET",
       dataType: "json",
       success:function(data){
-         $('.queue-num').html(data['qnum']);
-         $('.id-num').html(data['idnum']);
-         $('.q-status').html(data['qstatus']);
-         $('.q-total-sub').html(data['totalsub']);
 
-         if(data['qstatus'] == 'PAUSED'){
+        if(data['success']){
+          $('.queue-num').html(data['qnum']);
+          $('.id-num').html(data['idnum']);
+          $('.q-status').html(data['qstatus']);
+          $('.q-total-sub').html(data['totalsub']);
 
-           if($('.btn-pause-glyph').hasClass('glyphicon glyphicon-pause')){
-             $('.btn-pause').removeClass("btn-warning").addClass("btn-info");
-             $('.btn-pause-glyph').removeClass("glyphicon glyphicon-pause").addClass("glyphicon glyphicon-play");
-           }
-         }
+          // if(data['qstatus'] == 'PAUSED'){
+          //
+          //   if($('.btn-pause-glyph').hasClass('glyphicon glyphicon-pause')){
+          //     $('.btn-pause').removeClass("btn-warning").addClass("btn-info");
+          //     $('.btn-pause-glyph').removeClass("glyphicon glyphicon-pause").addClass("glyphicon glyphicon-play");
+          //   }
+          // }
 
-         if(data['qstatus'] == 'ONGOING'){
-
-           if($('.btn-pause-glyph').hasClass('glyphicon glyphicon-play')){
-             $('.btn-pause').removeClass("btn-info").addClass("btn-warning");
-             $('.btn-pause-glyph').removeClass("glyphicon glyphicon-play").addClass("glyphicon glyphicon-pause");
-           }
-         }
+          // if(data['qstatus'] == 'ONGOING'){
+          //
+          //   if($('.btn-pause-glyph').hasClass('glyphicon glyphicon-play')){
+          //     $('.btn-pause').removeClass("btn-info").addClass("btn-warning");
+          //     $('.btn-pause-glyph').removeClass("glyphicon glyphicon-play").addClass("glyphicon glyphicon-pause");
+          //   }
+          // }
+        }
       },
       error:function(){
        alert("ajax error");
@@ -161,7 +202,8 @@ $(document).ready(function(){
     });
   }
 
-  var fetchdetail = function(){
+  //ok
+  function fetchdetail(){
     $.ajax({
       url: "<?php echo site_url('fetchdetail'); ?>",
       method: "GET",
@@ -178,9 +220,11 @@ $(document).ready(function(){
           $('#detail-venue').html(data['venue']);
           $('#detail-rest').html(data['rest']);
           $('.content-detail').show();
+          fetchdisplay();
           $('.window-panel').show();
         }else{
           fetchlist();
+          $('.content-detail').hide();
           $('.window-panel').hide();
         }
       },
@@ -192,6 +236,7 @@ $(document).ready(function(){
 
   fetchdetail();
 
+  //ok
   $('.btn-create').click(function(){
 
     input = {
@@ -210,10 +255,12 @@ $(document).ready(function(){
        data: {input: input},
        dataType: "text",
        success:function(data){
-         if(data){
+         if(data.Result === 'CREATED'){
            fetchlist();
-         }else{
-           alert("Queue cannot be closed!")
+         }else if(data.Result === 'EXISTING'){
+           alert("Queue name already exists!")
+         }else if(data.Result === 'ERROR'){
+           alert("Failed! Check for invalid input!")
          }
        },
        error:function(){
@@ -222,6 +269,7 @@ $(document).ready(function(){
      });
   });
 
+  //ok
   $('.btn-join').click(function(){
 
     if(selected_list){
@@ -231,11 +279,14 @@ $(document).ready(function(){
          data: {selected: selected_list},
          dataType: "text",
          success:function(data){
-           if(data){
+
+           if(data == "JOINED"){
              fetchdetail();
              $('.panel-qlist').hide();
-           }else{
-             alert("Queue cannot be closed!")
+           }else if(data === 'HAS_QUEUE'){
+             alert("Failed to join queue!")
+           }else if(data === 'ERROR'){
+             alert("Failed to join queue!")
            }
          },
          error:function(){
@@ -247,6 +298,7 @@ $(document).ready(function(){
     }
   });
 
+  //ok
   $('.btn-leave').click(function(){
 
      $.ajax({
@@ -256,10 +308,9 @@ $(document).ready(function(){
       success:function(data){
 
         if(data['success']){
-          $('.content-detail').hide();
-          $('.panel-qlist').show();
-          fetchlist();
-          $('.window-panel').hide();
+          fetchdetail();
+        }else{
+          alert('Failed to leave queue!')
         }
       },
       error:function(){
@@ -268,10 +319,12 @@ $(document).ready(function(){
     });
   });
 
+  //ok
   $('.btn-status').click(function(){
     status();
   });
 
+  //ok
   $('.btn-close').click(function(){
     $.ajax({
        url: "<?php echo site_url('close'); ?>",
@@ -285,6 +338,7 @@ $(document).ready(function(){
      });
   });
 
+  //ok
   $('.btn-next').click(function(){
     $.ajax({
       type: 'GET',
@@ -307,11 +361,22 @@ $(document).ready(function(){
     }, 3000);
   });
 
-  $('.btn-pause').click(function(){
+  //ok
+  $('.btn-resume').click(function(){
 
-    if($('.btn-pause-glyph').hasClass('glyphicon glyphicon-pause')){
-      $(this).removeClass("btn-warning").addClass("btn-info");
-      $('.btn-pause-glyph').removeClass("glyphicon glyphicon-pause").addClass("glyphicon glyphicon-play");
+    $.ajax({
+        type: 'GET',
+        url: "<?php echo site_url('resume'); ?>",
+        dataType: 'json',
+        error: function () {alert("ajax error")},
+        success: function (data) {
+          $('.q-status').html(data);
+        }
+      });
+  });
+
+  //ok
+  $('.btn-pause').click(function(){
 
       $.ajax({
         type: 'GET',
@@ -322,22 +387,42 @@ $(document).ready(function(){
           $('.q-status').html(data);
         }
       });
-    }else{
-      $(this).removeClass("btn-info").addClass("btn-warning");
-      $('.btn-pause-glyph').removeClass("glyphicon glyphicon-play").addClass("glyphicon glyphicon-pause");
+  });
+
+  //ok
+  $('.btn-close').click(function(){
 
       $.ajax({
         type: 'GET',
-        url: "<?php echo site_url('resume'); ?>",
+        url: "<?php echo site_url('close'); ?>",
         dataType: 'json',
         error: function () {alert("ajax error")},
         success: function (data) {
           $('.q-status').html(data);
         }
       });
-    }
   });
 
+  //ok
+  $('.btn-reset').click(function(){
+
+      $.ajax({
+        type: 'GET',
+        url: "<?php echo site_url('reset'); ?>",
+        dataType: 'json',
+        error: function () {alert("ajax error")},
+        success: function (data) {
+          if(data.True){
+            $('.q-status').html(data);
+            alert('Queue has been reset');
+          }else{
+            alert('Queue reset failed!');
+          }
+        }
+      });
+  });
+
+  //ok
   $('.list-group-class').on('click', '.list-selected', function(){
 
     $(this).addClass('list-group-item-success').siblings().removeClass('list-group-item-success');
@@ -345,18 +430,30 @@ $(document).ready(function(){
     selected_list=$(this).find('.list-qname').text();
   });
 
+  //ok
+  function check_session(){
+    $.ajax({
+      type: 'GET',
+      url: "<?php echo site_url('check_session'); ?>",
+      dataType: 'json',
+      success: function (data) {
+        if(data.REDIRECT){
+          window.location.replace('<?php echo site_url('logout'); ?>');
+        }
+      },
+      error: function(xhr, textStatus, errorThrown) {
+        alert('Error!  Status = ' + xhr.status);
+      }
+    });
+  }
+
   var interval = 5000;
   function dbUpdate() {
 
-    if($('.panel-qlist').is(":visible")){
+    check_session();
+    fetchlist();
+    status();
 
-      fetchlist();
-    }
-
-    if($('.content-detail').is(":visible")){
-
-      status();
-    }
     setTimeout(dbUpdate, interval);
   }
   setTimeout(dbUpdate, interval);

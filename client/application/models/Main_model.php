@@ -1,151 +1,129 @@
 <?php
 class Main_model extends CI_Model {
 
+  //ok
   public function __construct(){
     $this->load->database();
   }
 
+  //ok
   public function existingusername(){
 
-    $this->db->where('client_userName', $this->input->post('user'));
-    if($this->db->count_all_results('client_info') == 1){
+    $result = $this->db
+      ->where('username', $this->input->post('user'))
+      ->count_all_results('client');
+
+    if($result == 1){
       return TRUE;
     }
 
     return FALSE;
 	}
 
+  //ok
   public function correctpassword(){
 
-    $this->db->where('client_userName', $this->input->post('user'));
-    $this->db->where('client_password', $this->input->post('pass'));
+    $result = $this->db
+      ->where('username', $this->input->post('user'))
+      ->where('password', $this->input->post('pass'))
+      ->count_all_results('client');
 
-    if($this->db->count_all_results('client_info') == 1){
+    if($result == 1){
       return TRUE;
     }
 
     return FALSE;
   }
 
-  public function fetchlist(){
-
-   return $this->db->get('client_transaction')->result();
-  }
-
-  public function getclients(){
-
-    $this->db->where('queue_name', $this->getqueuename());
-
-    $result = $this->db->get('client_info');
-
-    return $result;
-  }
-
-  public function edit($type, $content){
-
-    if($type=="name"){
-
-      $qname = $this->getqueuename();
-
-      $this->db->where('queue_name', $qname);
-      $this->db->set('queue_name', $content);
-      $this->db->update('client_transaction');
-
-      $this->db->reset_query();
-
-      $this->db->where('queue_name', $qname);
-      $this->db->set('queue_name', $content);
-      $this->db->update('client_info');
-    }
-
-    $result = array(
-      'success' => TRUE,
-      'error' => "Wrong Input"
-    );
-
-    return $result;
-  }
-
-	public function existingclient(){
-
-    $this->db->where('client_userName', $this->input->post('user'));
-    $this->db->where('client_password', $this->input->post('pass'));
-
-    if($this->db->count_all_results('client_info') == 1){
-      return TRUE;
-    }
-
-    return FALSE;
-
-	}
-
-  public function existingQueue(){
-
-    $this->db->where('queue_name', $this->input->post('input')['name']);
-    $this->db->where('queue_name', $this->input->post('input')['code']);
-
-    if($this->db->count_all_results('client_transaction') == 1){
-
-      return TRUE;
-
-    }
-
-    return FALSE;
-	}
-
-  public function existingcode($user_type, $code){
-
-    if($user_type == "client"){
-
-      $this->db->where('code', $code);
-
-      if($this->db->count_all_results('permission_code') == 1){
-        return TRUE;
-      }
-    }else if($user_type == "clerk"){
-
-      $this->db->where('code', $code);
-
-      if($this->db->count_all_results('clerk_code') == 1){
-        return TRUE;
-      }
-    }
-
-    return FALSE;
-  }
-
+  //ok
   public function signup(){
-		$this->load->helper('url');
 
     if($this->existingusername()){
+
       return FALSE;
     }
 
-    if(!$this->existingcode("client", $this->input->post('code'))){
+    if(!$this->existingcode()){
+
       return FALSE;
     }
 
-    $this->db->reset_query();
-
-		$data = array(
-			'client_userName' => $this->input->post('user'),
-			'client_password' => $this->input->post('pass'),
+    $data = array(
+      'username' => $this->existingusername(),
+      'password' => $this->existingcode(),
       'queue_name' => "none",
       'current' => 0,
       'display_name' => "none",
-		);
+    );
 
-		$this->db->insert('client_info', $data);
+    if($this->db->insert('client', $data)){
+      return TRUE;
+    }
 
-    return TRUE;
+    return FALSE;
 	}
 
+  //ok
+  public function fetchlist(){
+
+    if($this->hasqueue()){
+      return;
+    }
+
+    return $this->db->get('client_transaction')->result();
+  }
+
+  //ok
+  public function getclients(){
+
+    $queue_name = $this->getqueuename();
+
+    if($queue_name !== 'none'){
+
+      $result = $this->db
+        ->where('queue_name', $queue_name)
+        ->where('display_name !=', 'none')
+        ->get('client');
+
+      return $result;
+    }
+
+    return;
+  }
+
+  //ok
+  public function existingqueue(){
+
+    $result = $this->db
+      ->where('queue_name', $this->input->post('input')['name'])
+      ->count_all_results('client_transaction');
+
+    if($result == 1){
+      return TRUE;
+    }
+
+    return FALSE;
+	}
+
+  //ok
+  public function existingcode(){
+
+    $result = $this->db
+      ->query("SELECT * FROM client_code WHERE BINARY code = ".$this->db->escape($this->input->post('code'))."")
+      ->num_rows();
+
+    if($result == 1){
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+  //ok
   public function create(){
 
-    $this->load->helper('url');
-
     if($this->existingqueue()){
-      return FALSE;
+      return 'EXISTING';
     }
 
     $data = array(
@@ -162,223 +140,325 @@ class Main_model extends CI_Model {
       'click' => 0
     );
 
-    $this->db->insert('client_transaction', $data);
-
-    return TRUE;
-  }
-
-  public function join(){
-
-    $this->load->helper('url');
-
-    if($this->hasqueue()){
-      return FALSE;
+    if($this->db->insert('client_transaction', $data)){
+      return 'CREATED';
     }
 
-    $this->db->set('queue_name', $this->input->post('selected'));
-    $this->db->where('client_userName', $this->session->userdata['username']);
-    $this->db->update('client_info');
-
-    return TRUE;
+    return 'ERROR';
   }
 
-  public function close(){
+  //ok
+  public function join(){
 
-    $this->db->set('serving_atNo', 0);
-    $this->db->set('total_deployNo', 0);
-    $this->db->set('life', 3);
-    $this->db->set('click', 0);
+    if($this->hasqueue()){
+      return 'HAS_QUEUE';
+    }
 
-    $this->db->where('queue_name', $this->getqueuename());
+    $result = $this->db
+      ->set('queue_name', $this->input->post('selected'))
+      ->where('username', $_SESSION['username'])
+      ->update('client');
 
-    $this->db->update('client_transaction');
+    if($result){
+      return 'JOINED';
+    }
 
+    return 'ERROR';
+  }
+
+  //ok
+  public function reset(){
+
+    if(!$this->db
+      ->set('serving_atNo', 0)
+      ->set('total_deployNo', 0)
+      ->set('life', 1)
+      ->set('click', 0)
+      ->where('queue_name', $this->getqueuename())
+      ->update('client_transaction')){
+        return FALSE;
+      }
+
+    //set all queuers to out
+    //return FALSE if fail
+    if(!$this->db
+      ->set('queuer_state', 'out')
+      ->where('queue_name', $this->getqueuename())
+      ->update('queuer')){
+        return FALSE;
+      }
+
+    //set client current service to 0
+    //return FALSE if fail
+    if(!$this->db
+      ->set('current', 0)
+      ->where('username', $_SESSION['username'])
+      ->update('client')){
+        return FALSE;
+      }
+
+    return TRUE;
 	}
 
+  //ok
   public function leave(){
-
-    $this->load->helper('url');
 
     if(!$this->hasqueue()){
       return FALSE;
     }
 
-    $this->db->where('client_userName', $this->session->userdata('username'));
-    $this->db->set('queue_name', 'none');
-    $this->db->update('client_info');
-
-    return TRUE;
+    return $this->db
+      ->where('username', $_SESSION['username'])
+      ->set('queue_name', 'none')
+      ->update('client');
   }
 
+  //ok
 	public function incrementcurrent(){
 
-    $this->db->where('queue_name', $this->getqueuename());
-    $this->db->set('click', 'click+1', FALSE);
-    $this->db->update('client_transaction');
+    $update_click = $this->db
+      ->where('queue_name', $this->getqueuename())
+      ->set('click', 'click+1', FALSE)
+      ->update('client_transaction');
 
-    $this->db->reset_query();
+    if(!$update_click){
+      return 0;
+    }
 
-    $this->db->set('current', $this->getcurrentservicenum());
-    $this->db->where('client_userName', $this->session->userdata('username'));
-    $this->db->update('client_info');
+    $update_current = $this->db
+      ->set('current', $this->getcurrentservicenum())
+      ->where('username', $_SESSION['username'])
+      ->update('client');
+
+    if(!$update_current){
+      return 0;
+    }
 
     return $this->getcurrentservicenum();
 	}
 
-
+  //ok
 	public function incrementid(){
 
-   $this->db->where('queue_name', $this->getqueuename());
-   $this->db->where('queue_number', $this->getcurrentservicenum());
+    $result = $this->db
+      ->where('queue_name', $this->getqueuename())
+      ->where('queue_number', $this->getcurrentservicenum())
+      ->get('queuer')
+      ->row();
 
-   $var = $this->db->get('queuer')->row();
-
-   if($var){
-     return $var->id_number;;
+   if($result){
+     return $result->id_number;;
    }else{
      return "none";
    }
 	}
 
+  //ok
   public function hasqueue(){
 
-    $this->db->where('client_userName', $this->session->userdata('username'));
-    $this->db->where('queue_name', 'none');//is code NULL
+    $result = $this->db
+      ->where('username', $_SESSION['username'])
+      ->where('queue_name', 'none')
+      ->count_all_results('client');
 
-    if($this->db->count_all_results('client_info') == 0){
+    if($result == 0){
+
       return TRUE;
     }
 
     return FALSE;
   }
 
+  //ok
   public function fetchdetail(){
 
-    $this->db->where('queue_name', $this->getqueuename());
+    $result = $this->db
+      ->where('queue_name', $this->getqueuename())
+      ->get('client_transaction')
+      ->row();
 
-    return $this->db->get('client_transaction')->row();
+    return $result;
   }
 
+  //ok
   public function getqueuename(){
 
-    $this->db->where('client_userName', $this->session->userdata('username'));
+    $result = $this->db
+      ->where('username', $_SESSION['username'])
+      ->get('client')
+      ->row();
 
-    return $this->db->get('client_info')->row()->queue_name;
+    if(empty($result)){
+
+      return 'none';
+    }else{
+
+      return $result->queue_name;
+    }
   }
 
+  //ok
   public function getcurrentservicenum(){
 
-    $this->db->where('queue_name', $this->getqueuename());
+    $serving = $this->db
+      ->where('queue_name', $this->getqueuename())
+      ->get('client_transaction')
+      ->row();
 
-    $serving = $this->db->get('client_transaction')->row()->serving_atNo;
+    if(empty($serving)){
+      $serving = 0;
+    }else{
+      $serving = $serving->serving_atNo;
+    }
 
-    $this->db->where('queue_name', $this->getqueuename());
+    $click = $this->db
+      ->where('queue_name', $this->getqueuename())
+      ->get('client_transaction')
+      ->row();
 
-    $click = $this->db->get('client_transaction')->row()->click;
+    if(empty($click)){
+      $click = 0;
+    }else{
+      $click = $click->click;
+    }
 
     return $serving + $click;
   }
 
+  //ok
   public function getcurrentid(){
 
-    $this->db->where('queue_name', $this->getqueuename());
-    $this->db->where('queue_number', $this->getcurrentservicenum());
+    $result = $this->db
+      ->where('queue_name', $this->getqueuename())
+      ->where('queue_number', $this->getcurrentservicenum())
+      ->get('queuer')
+      ->row();
 
-    $var = $this->db->get('queuer')->row();
-
-    if($var){
-      return $var->id_number;;
+    if(!empty($result)){
+      return $result->id_number;
     }else{
       return "none";
     }
   }
 
+  //ok
   public function getdeployno(){
 
-    $this->db->where('queue_name', $this->getqueuename());
+    $result = $this->db
+      ->where('queue_name', $this->getqueuename())
+      ->get('client_transaction')
+      ->row();
 
-    $var = $this->db->get('client_transaction')->row();
-
-    if($var->total_deployNo){
-      return $var->total_deployNo;
+    if(!empty($result)){
+      return $result->total_deployNo;
     }else{
-      return "none";
+      return 'none';
     }
 	}
 
+  //ok
   public function getstatus(){
 
-    $this->db->where('queue_name', $this->getqueuename());
+    $result = $this->db
+      ->where('queue_name', $this->getqueuename())
+      ->get('client_transaction')
+      ->row();
 
-    $var = $this->db->get('client_transaction')->row();
+    if(empty($result)){
 
-    if($var->life == 1){
-      return 'ONGOING';
-    }else if ($var->life == 2){
-      return 'PAUSED';
-    }else if ($var->life == 3){
-      return 'CLOSED';
-    }else{
-      return 'UNIDENTIFIED';
+      return 'UNDEFINED';
     }
+
+    if($result->life == 1){
+
+      return 'ONGOING';
+    }else if ($result->life == 2){
+
+      return 'PAUSED';
+    }else if ($result->life == 3){
+
+      return 'CLOSED';
+    }
+
+    return 'UNDEFINED';
   }
 
+  //ok
   public function setstatus($var){
 
-    $this->db->set('life', $var);
+    $status = $this->db
+      ->where('queue_name', $this->getqueuename())
+      ->set('life', $var)
+      ->update('client_transaction');
 
-    $this->db->where('queue_name', $this->getqueuename());
-    $this->db->update('client_transaction');
+    if(empty($status)){
+
+      return FALSE;
+    }else{
+
+      return TRUE;
+    }
 	}
 
-
+  //ok
   public function editq($type, $content){
 
-    $this->db->where('queue_name', $this->getqueuename());
+    $update = $this->db
+    ->where('queue_name', $this->getqueuename())
+    ->set($type, $content)
+    ->update('client_transaction');
 
-    if($type=="seat"){
+    if($update){
 
-      $this->db->set('seats_offered', $content);
+      return array(
+        'success' => TRUE,
+        'error' => "Wrong Input"
+      );
+    }else{
 
-    }else if($type=="desc"){
-
-      $this->db->set('queue_description', $content);
-
-    }else if($type=="req"){
-
-      $this->db->set('requirements', $content);
-
-    }else if($type=="venue"){
-
-      $this->db->set('venue', $content);
-
-    }else if($type=="rest"){
-
-      $this->db->set('queue_restriction', $content);
+      return array(
+        'success' => FALSE,
+        'error' => "Wrong Input"
+      );
     }
-
-    $this->db->update('client_transaction');
-
-    $result = array(
-      'success' => TRUE,
-      'error' => "Wrong Input"
-    );
-
-    return $result;
   }
 
+  //ok
   public function editdisplay($content){
 
-    $this->db->where('client_userName', $this->session->userdata['username']);
-    $this->db->set('display_name', $content);
-    $this->db->update('client_info');
+    $update = $this->db
+      ->where('username', $_SESSION['username'])
+      ->set('display_name', $content)
+      ->update('client');
 
-    $result = array(
-      'success' => TRUE,
-      'error' => "Wrong Input"
-    );
+    if($update){
+      return array(
+        'success' => TRUE,
+        'error' => "Wrong Input"
+      );
+    }else{
+      return array(
+        'success' => FALSE,
+        'error' => "Wrong Input"
+      );
+    }
+  }
 
-    return $result;
+  //ok
+  public function fetchdisplay(){
+
+    $result = $this->db
+      ->where('username', $_SESSION['username'])
+      ->get('client')
+      ->row();
+
+    if(empty($result)){
+
+      return 'none';
+    }else{
+
+      return $result->display_name;
+    }
   }
 
 }

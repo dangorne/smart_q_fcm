@@ -1,28 +1,3 @@
-<!-- <div class="modal fade" id="createModal" tabindex="-1" role="dialog" aria-labelledby="createModalLabel">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="createModalLabel"><strong>Edit</strong></h4>
-      </div>
-
-      <div class="modal-body">
-
-          <label for="qname">Name</label>
-          <input type="text" id="create-name" name="qname" class="form-control">
-
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default btn-join" data-dismiss="modal">Join</button>
-      </div>
-
-    </div>
-  </div>
-</div> -->
-
-
 <div class="modal fade" id="statusModal" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel" data-backdrop="static">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -56,12 +31,6 @@
           <div class="btn-group btn-group-lg btn-group-justified" role="group">
 
             <div class="btn-group" role="group">
-              <button type="button" class="btn btn-warning btn-pause" >
-                <span class="glyphicon glyphicon-pause btn-pause-glyph"></span>
-              </button>
-            </div>
-
-            <div class="btn-group" role="group">
               <button type="button" class="btn btn-success btn-next">
                 <span class="glyphicon glyphicon-chevron-right btn-success-glyph"></span>
               </button>
@@ -81,13 +50,13 @@
   </div>
 </div>
 
-<div class="modal fade" id="createModal" tabindex="-1" role="dialog" aria-labelledby="createModalLabel">
+<div class="modal fade" id="createModal" tabindex="-1" role="dialog" aria-labelledby="createModalLabel" data-backdrop="static">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
 
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="createModalLabel"><strong>Edit</strong></h4>
+        <h4 class="modal-title" id="createModalLabel"><strong>Create</strong></h4>
       </div>
 
       <div class="modal-body">
@@ -176,7 +145,6 @@
   </div>
 </div>
 
-
 <div class="modal fade" id="reqModal" tabindex="-1" role="dialog" aria-labelledby="reqModalLabel" data-backdrop="static">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -186,18 +154,9 @@
         <h4 class="modal-title" id="reqModalLabel"><strong>Edit Requirements</strong></h4>
       </div>
 
-      <!-- <div class="modal-body">
-
-        <label for="old-qname">old</label>
-        <input type="text" id="old-name" name="old-qname" class="form-control">
-
-      </div> -->
-
       <div class="modal-body">
 
         <textarea id="new-req" class="form-control" rows="3"></textarea>
-
-        <!-- <input type="text" id="new-name" name="new-name" class="form-control"> -->
 
       </div>
 
@@ -210,7 +169,6 @@
   </div>
 </div>
 
-
 <div class="modal fade" id="venueModal" tabindex="-1" role="dialog" aria-labelledby="venueModalLabel" data-backdrop="static">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -220,16 +178,7 @@
         <h4 class="modal-title" id="venueModalLabel"><strong>Edit Venue</strong></h4>
       </div>
 
-      <!-- <div class="modal-body">
-
-        <label for="old-qname">old</label>
-        <input type="text" id="old-name" name="old-qname" class="form-control">
-
-      </div> -->
-
       <div class="modal-body">
-
-        <!-- <textarea id="new-name" class="form-control" rows="3"></textarea> -->
 
         <input type="text" id="new-venue" class="form-control">
 
@@ -274,7 +223,7 @@
 
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="displayModalLabel"><strong>Edit display Offered</strong></h4>
+        <h4 class="modal-title" id="displayModalLabel"><strong>Edit display Name</strong></h4>
       </div>
 
       <div class="modal-body">

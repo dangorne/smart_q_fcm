@@ -9,16 +9,21 @@
         <div class="panel-body">
 
           <?php echo form_open('login') ?>
+
           <?php
-            if($this->session->userdata('user_error') != ''){
+
+            if(isset($_SESSION['USER_NOT_EXIST']) == 'TRUE'){
+
               echo '<div class="alert alert-danger" role="alert"><strong>Username does not exist.</strong></div>';
-            }else if($this->session->userdata('pass_error') != ''){
+            }else if(isset($_SESSION['WRONG_PASS']) == 'TRUE'){
+
               echo '<div class="alert alert-danger" role="alert"><strong>Incorrect password.</strong></div>';
             }
           ?>
+
           <?php
 
-           if($this->session->userdata('syntax_error') != '' && form_error('user') != ''){
+           if(form_error('user') != ''){
 
              echo '<div class="form-group has-error">';
              echo '<label class="control-label" for="user">Username</label>';
@@ -36,7 +41,7 @@
 
           <?php
 
-           if($this->session->userdata('syntax_error') != '' && form_error('pass') != ''){
+           if(form_error('pass') != ''){
 
              echo '<div class="form-group has-error">';
              echo '<label class="control-label" for="pass">Password</label>';

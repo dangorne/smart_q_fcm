@@ -1,45 +1,49 @@
 <?php
 class Main_model extends CI_Model {
 
-  public function __construct()
-  {
+  //ok
+  public function __construct(){
     $this->load->database();
   }
 
+  //ok
   public function existingusername(){
 
-    $this->db->where('userName', $this->input->post('user'));
-    if($this->db->count_all_results('subscriber') == 1){
-      return TRUE;
-    }
+    $result = $this->db
+      ->where('username', $this->input->post('user'))
+      ->count_all_results('subscriber');
 
-    return FALSE;
-	}
-
-  public function correctpassword(){
-
-    $this->db->where('userName', $this->input->post('user'));
-    $this->db->where('password', $this->input->post('pass'));
-
-    if($this->db->count_all_results('subscriber') == 1){
+    if($result == 1){
       return TRUE;
     }
 
     return FALSE;
   }
 
-	public function existingsubscriber(){
+  //ok
+  public function correctpassword(){
 
-    $this->db->where('userName', $this->input->post('user'));
-    $this->db->where('password', $this->input->post('pass'));
+    $result = $this->db
+      ->where('username', $this->input->post('user'))
+      ->where('password', $this->input->post('pass'))
+      ->count_all_results('subscriber');
 
-    if($this->db->count_all_results('subscriber') == 1){
+    if($result == 1){
       return TRUE;
     }
 
     return FALSE;
-	}
+  }
 
+  //ok
+  public function idexist(){
+    return $this->db
+      ->where('id_number', $this->input->post('idnum'))
+      ->get('subscriber')
+      ->row();
+  }
+  
+  //ok
   public function signup(){
 
 		$this->load->helper('url');
@@ -54,7 +58,7 @@ class Main_model extends CI_Model {
       'id_number' => $this->input->post('idnum'),
 			'userName' => $this->input->post('user'),
 			'password' => $this->input->post('pass'),
-      'cell_number' => $this->input->post('phonenum'),
+      'cell_number' => "+63".$this->input->post('phonenum'),
       'subscriber_college' => $this->input->post('college'),
 		);
 
@@ -63,198 +67,252 @@ class Main_model extends CI_Model {
     return TRUE;
 	}
 
-  public function hasqueue(){
-
-    $this->db->where('client_userName', $this->session->userdata('username'));
-    $this->db->where('queue_name', 'none');
-    if($this->db->count_all_results('client_info') == 0){
-      return TRUE;
-    }
-
-    return FALSE;
-  }
-
+  //ok
   public function getcurrentservicenum($var){
 
-    $this->db->where('queue_name', $var);
+    $serving = $this->db
+      ->where('queue_name', $var)
+      ->get('client_transaction')
+      ->row();
 
-    $serving = $this->db->get('client_transaction')->row()->serving_atNo;
+    if(empty($serving)){
+      $serving = 0;
+    }else{
+      $serving = $serving->serving_atNo;
+    }
 
-    $this->db->where('queue_name', $var);
+    $click = $this->db
+      ->where('queue_name', $var)
+      ->get('client_transaction')
+      ->row();
 
-    $click = $this->db->get('client_transaction')->row()->click;
+    if(empty($click)){
+      $click = 0;
+    }else{
+      $click = $click->click;
+    }
 
     return $serving + $click;
-
   }
 
-  public function getqueue(){
-
-    $this->db->where('client_userName', $this->session->userdata('username'));
-
-    return $this->db->get('client_info')->row()->queue_name;
-
-  }
-
+  //ok
   public function getstatus($queue){
 
-    $this->db->where('queue_name', $queue);
+    $result = $this->db
+      ->where('queue_name', $queue)
+      ->get('client_transaction')
+      ->row();
 
-    $var = $this->db->get('client_transaction')->row();
+    if(empty($result)){
 
-    if($var->life == 1){
-      return 'ONGOING';
-    }else if ($var->life == 2){
-      return 'PAUSED';
-    }else if ($var->life == 3){
-      return 'CLOSED';
-    }else{
-      return 'UNIDENTIFIED';
+      return 'UNDEFINED';
     }
+
+    if($result->life == 1){
+
+      return 'ONGOING';
+    }else if ($result->life == 2){
+
+      return 'PAUSED';
+    }else if ($result->life == 3){
+
+      return 'CLOSED';
+    }
+
+    return 'UNDEFINED';
   }
 
-   public function getsearchresult($match){
+  //ok
+  public function getsearchresult($match){
 
-    if($match != ''){
+    if(!empty($match)){
 
-      $this->db->like('queue_name', $match)
+      $result = $this->db
+        ->like('queue_name', $match)
         ->group_start()
         ->where('life', 1)
         ->or_where('life', 2)
-        ->group_end();
+        ->or_where('life', 3)
+        ->group_end()
+        ->get('client_transaction')
+        ->result();
 
-      return $this->db->get('client_transaction')->result();
+      return $result;
     }
 
-    $this->db->where('life', 1);
-    $this->db->or_where('life', 2);
-    return $this->db->get('client_transaction')->result();
-   }
+    $result = $this->db
+      ->where('life', 1)
+      ->or_where('life', 2)
+      ->or_where('life', 3)
+      ->get('client_transaction')
+      ->result();
 
-   public function getlist(){
+    return $result;
+  }
 
-    $this->db->where('id_number', $this->getsubscriberid());
-    $this->db->where('queuer_state', 'in');
+  //ok
+  public function fetchlist(){
 
-    return $this->db->get('queuer')->result();
-   }
+  return $this->db
+          ->where('id_number', $this->getsubscriberid())
+          ->where('queuer_state', 'in')
+          ->get('queuer')
+          ->result();
+  }
 
-   public function getself($queue){
+  //ok
+  public function getself($queue){
 
-    $this->db->where('id_number', $this->getsubscriberid());
-    $this->db->where('queue_name', $queue);
-    $this->db->where('queuer_state', 'in');
+  $result = $this->db
+    ->where('id_number', $this->getsubscriberid())
+    ->where('queue_name', $queue)
+    ->where('queuer_state', 'in')
+    ->get('queuer')
+    ->row();
 
-    return $this->db->get('queuer')->row()->queue_number;
-   }
+  if(empty($result)){
+    return 0;
+  }
 
-   public function fetchpanel($match){
+  return $result->queue_number;
+  }
 
-      $this->db->like('queue_name', $match);
+  //ok
+  public function fetchpanel(){
 
-      return $this->db->get('client_transaction')->row();
-   }
+    return $this->db
+      ->where('queue_name', $this->input->post('selected'))
+      ->get('client_transaction')
+      ->row();
+  }
 
+  //ok
   public function alreadyinqueue($queue){
 
-    $this->db->reset_query();
+    $result = $this->db
+      ->where('id_number', $this->getsubscriberid())
+      ->where('queue_name', $queue)
+      ->where('queuer_state', 'in')
+      ->count_all_results('queuer');
 
-    $this->db->where('id_number', $this->getsubscriberid());
-    $this->db->where('queue_name', $queue);
-    $this->db->where('queuer_state', 'in');
-
-
-    if($this->db->count_all_results('queuer') > 0){
+    if($result == 1){
       return TRUE;
     }
 
     return FALSE;
-
   }
 
+  //ok
   public function getsubscriberid(){
 
-    $this->db->reset_query();
-    $this->db->where('userName', $this->session->userdata('username'));
+    $result = $this->db
+      ->where('username', $_SESSION['username'])
+      ->get('subscriber')
+      ->row();
 
-    $var = $this->db->get('subscriber')->row();
-
-    if($var){
-      return $var->id_number;
+    if(!empty($result)){
+      return $result->id_number;
     }else{
-      return "none";
+      return 'none';
     }
   }
 
+  //ok
   public function incrementedlastnumber($queue){
 
-    $this->db->where('queue_name', $queue);
-    $this->db->set('total_deployNo', 'total_deployNo+1', FALSE);
-    $this->db->update('client_transaction');
+    $increment = $this->db
+      ->where('queue_name', $queue)
+      ->set('total_deployNo', 'total_deployNo+1', FALSE)
+      ->update('client_transaction');
 
-    $this->db->reset_query();
+    if(empty($increment)){
 
-    $this->db->where('queue_name', $queue);
-    $var = $this->db->get('client_transaction')->row();
+      return 0;
+    }
 
-    return $var->total_deployNo;
+    $result = $this->db
+      ->where('queue_name', $queue)
+      ->get('client_transaction')
+      ->row();
+
+    if(empty($result)){
+
+      return 0;
+    }
+
+    return $result->total_deployNo;
   }
 
+  //ok
   public function join($queue){
 
     date_default_timezone_set('Asia/Manila');
 
     if($this->alreadyinqueue($queue)){
-      return "EXIST";
+      return 'EXIST';
     }
 
-    if($this->getStatus($queue) == "ONGOING"){
+    $status = $this->getstatus($queue);
 
-      $data = array(
-   			 'id_number' => $this->getsubscriberid(),
-         'queue_name' => $queue,
-   			 'queue_number' => $this->incrementedlastnumber($queue),
-         'join_time' => date('Y-m-d H:i:s'),
-         'join_type' => 'web',
-   		);
+    if($status == 'ONGOING'){
 
-      $this->db->insert('queuer', $data);
+      $this->db->insert('queuer', array(
+        'id_number' => $this->getsubscriberid(),
+        'queue_name' => $queue,
+        'queue_number' => $this->incrementedlastnumber($queue),
+        'join_time' => date('Y-m-d H:i:s'),
+        'join_type' => 'web',
+   		));
 
-      return "ONGOING";
-    }else{
+      return 'ONGOING';
+    }else if($status == 'PAUSED'){
 
-      return "PAUSED";
+      return 'PAUSED';
+    }else if($status == 'CLOSED'){
+
+      return 'CLOSED';
+    }else if($status == 'UNDEFINED'){
+
+      return 'UNDEFINED';
     }
  	}
 
+  //ok
   public function leave($queue){
 
-    if(!$this->AlreadyInQueue($queue)){
-      return "NOTINQUEUE";
+    if(!$this->alreadyinqueue($queue)){
+      return 'NOTINQUEUE';
     }
 
-    $this->db->where('id_number', $this->getsubscriberid());
-    $this->db->where('queue_name', $queue);
-    $this->db->set('queuer_state', 'out');
+    if($this->db
+      ->where('id_number', $this->getsubscriberid())
+      ->where('queue_name', $queue)
+      ->set('queuer_state', 'out')
+      ->update('queuer')){
 
-    $this->db->update('queuer');
+      return 'LEFT';
+    }
 
-    return "LEFT";
+    return 'FAIL';
   }
 
+  //ok
   public function fetchsubdetail(){
 
-    $this->db->where('userName', $this->session->userdata['username']);
-    return $this->db->get('subscriber')->row();
+    return $this->db
+      ->where('username', $_SESSION['username'])
+      ->get('subscriber')
+      ->row();
   }
 
-  public function savesubdetail($phonenum, $college){
+  //ok
+  public function savesubdetail(){
 
-    $this->db->where('userName', $this->session->userdata['username']);
-
-    $this->db->set('cell_number', $phonenum);
-    $this->db->set('subscriber_college', $college);
-    $this->db->update('subscriber');
+    return $this->db
+      ->where('userName', $_SESSION['username'])
+      ->set('cell_number', $this->input->post('phonenum'))
+      ->set('subscriber_college', $this->input->post('college'))
+      ->update('subscriber');
   }
 
 }

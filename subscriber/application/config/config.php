@@ -24,9 +24,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |
 */
 // $config['base_url'] = 'http://192.168.5.61/subscriber';
-// $config['base_url'] = 'http://192.168.1.13/subscriber';
-// $config['base_url'] = 'http://192.168.254.100/subscriber';
-$config['base_url'] = 'http://localhost/subscriber';
+//$config['base_url'] = 'http://192.168.43.99/subscriber';
+$config['base_url'] = 'http://192.168.254.100/subscriber';
+// $config['base_url'] = 'http://localhost/subscriber';
 
 /*
 |--------------------------------------------------------------------------

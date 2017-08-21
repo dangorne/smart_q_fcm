@@ -9,195 +9,180 @@
       $this->load->library('session');
       $this->load->model('main_model');
       $this->load->helper('url_helper');
-      // $this->load->helper('form');
-      // $this->load->library('form_validation');
+      $this->load->helper('form');
+      $this->load->library('form_validation');
 
     }
 
+    //ok
+    public function setflash($key){
+
+      $_SESSION[$key] = 'TRUE';
+      $this->session->mark_as_flash($key);
+    }
+
+    //ok
     public function index(){
 
-      if($this->session->userdata('username') != '' ){
-        // if($this->main_model->hasQueue()){
-          redirect('dashboard');
-        // }else{
-          // redirect('dashboard');
-          // redirect('createq');
-        // }
-        // $this->load->view('templates/header_logout');
-        // $this->load->view('home');
-        // $this->load->view('templates/footer');
+      if(isset($_SESSION['username'])){
+
+        redirect('dashboard');
       }else{
-        // $this->load->view('templates/header_login_signup');
-        // $this->load->view('home');
-        // $this->load->view('templates/footer');
+
         redirect('login');
       }
-
     }
 
+    //ok
     public function window(){
 
-      $this->load->view('window');
-      $this->load->view('windowjs');
+      if(isset($_SESSION['username'])){
 
+        $this->load
+          ->view('window')
+          ->view('windowjs');
+      }else{
+
+        redirect('logout');
+      }
     }
 
+    //ok
     public function logout(){
 
-      // if($this->session->userdata('username') != '' && $this->main_model->isLoggedIn()){
-      if($this->session->userdata('username') != ''){
+      if(isset($_SESSION['username'])){
 
-        //logout user by setting fieldname to false
-        // $this->main_model->isLoggedIn();
-
-        // $this->main_model->logoutUser();
-        // //unset user and type
         unset($_SESSION['username']);
       }
 
-      //go back to home page with no session
       redirect(base_url(). '');
-
     }
 
+    //ok
     public function login(){
 
-      $this->load->helper('form');
-      $this->load->library('form_validation');
-      // echo "<pre>";
-      // print_r ($this->session->all_userdata());
-      // echo "</pre>";
-      if($this->session->userdata('username') == '' ){
-        $this->load->view('templates/header_login_signup');
-        $this->load->view('login');
-        $this->load->view('templates/footer');
-      // }else if($this->session->userdata('username') != '' && $this->main_model->hasQueue()){
-      //   redirect('dashboard');
-      // }else if($this->session->userdata('username') != '' && !$this->main_model->hasQueue()){
-      //   redirect('createq');
-      }
+      if(!isset($_SESSION['username'])){
 
+        $this->load
+          ->view('templates/header_login_signup')
+          ->view('login')
+          ->view('templates/footer');
+
+        unset($_SESSION['USER_NOT_EXIST']);
+        unset($_SESSION['WRONG_PASS']);
+      }else{
+
+        redirect('logout');
+      }
     }
 
+    //ok
     public function signup(){
 
-      $this->load->helper('form');
-      $this->load->library('form_validation');
+      if(!isset($_SESSION['username'])){
 
-      if($this->session->userdata('username') == '' ){
-        $this->load->view('templates/header_login_signup');
-        $this->load->view('signup');
-        $this->load->view('templates/footer');
+        $this->load
+          ->view('templates/header_login_signup')
+          ->view('signup')
+          ->view('templates/footer');
+
+        unset($_SESSION['SYNTAX_ERROR']);
+        unset($_SESSION['PASS_NOT_MATCH']);
+        unset($_SESSION['USER_EXIST']);
+      }else {
+
+        redirect('logout');
       }
-
     }
 
+    //ok
     public function dashboard(){
 
-      $this->load->helper('form');
-      $this->load->library('form_validation');
+      if(isset($_SESSION['username'])){
 
-      // if($this->session->userdata('username') == '' ){
-      //   redirect('login');
-      // }else if($this->session->userdata('username') != '' && $this->main_model->hasQueue()){
-      //
-      //   $data['qnum'] = $this->main_model->getCurrentServiceNum();
-      //   $data['idnum'] = $this->main_model->getCurrentID();
-      //   $data['status'] = $this->main_model->getStatus();
-      //   $data['dbupdate'] = $this->main_model->getUpdate();
+        $this->load
+          ->view('templates/header_logout')
+          ->view('modal')
+          ->view('client')
+          ->view('dashboard')
+          ->view('templates/footer');
+      }else{
 
-      $this->load->view('templates/header_logout');
-      $this->load->view('modal');
-      $this->load->view('client');
-      $this->load->view('dashboard');
-      $this->load->view('templates/footer');
-      // }else if($this->session->userdata('username') != '' && !$this->main_model->hasQueue()){
-      //   redirect('createq');
-      // }
+        redirect('login');
+      }
     }
 
+    //ok
     public function login_validated(){
 
-      $this->load->helper('form');
-      $this->load->library('form_validation');
+      $user = $this->input->post('user');
+      $pass = $this->input->post('pass');
 
-		  if ($this->form_validation->run('syntax_login')){
+      if($this->form_validation->run('syntax_login')){
 
-        if ($this->main_model->existingusername()){
+        if($this->main_model->existingusername()){
 
-          unset($_SESSION['user_error']);
           if($this->main_model->correctpassword()){
 
-              $userdata = array(
-               'username' => $this->input->post('user')
-              );
-              $this->session->set_userdata($userdata);
+            $_SESSION['username'] = $user;
 
-                redirect('dashboard');
-
+            redirect('dashboard');
           }else{
 
-            $this->session->set_flashdata('pass_error', 'error');
+            $this->setflash('WRONG_PASS');
             $this->login();
           }
        }else{
 
-          $this->session->set_flashdata('user_error', 'error');
+          $this->setflash('USER_NOT_EXIST');
           $this->login();
        }
-  	 }else{
+     }else{
 
         if ($this->main_model->existingusername()){
 
           if(!$this->main_model->correctpassword()){
 
-            $this->session->set_flashdata('pass_error', 'error');
+            $this->setflash('WRONG_PASS');
           }
         }else{
 
-          $this->session->set_flashdata('user_error', 'error');
+          $this->setflash('USER_NOT_EXIST');
         }
 
-        $this->session->set_flashdata('syntax_error', 'error');
         $this->login();
-  	 }
-   }
+     }
+    }
 
-   public function signup_validated(){
+    //ok
+    public function signup_validated(){
 
-     $this->load->helper('form');
-     $this->load->library('form_validation');
+     if($this->form_validation->run('syntax_signup')){
 
-     if ($this->form_validation->run('syntax_signup')){
+       $user = $this->input->post('user');
+       $pass = $this->input->post('pass');
+       $confirmpass = $this->input->post('confirmpass');
+       $code = $this->input->post('code');
 
-       $this->session->unset_userdata('SYNTAX_ERROR');
+       if($pass != $confirmpass){
 
-       if($this->input->post('pass') != $this->input->post('confirmpass')){
-
-         $this->session->set_flashdata('PASS_NOT_MATCH', 'TRUE');
+         $this->setflash('PASS_NOT_MATCH');
          $this->signup();
          return;
        }
 
-       if(!$this->main_model->existingcode("client", $this->input->post('code'))){
+       if(!$this->main_model->existingcode()){
 
-         $this->session->set_flashdata('CODE_NOT_EXIST', 'TRUE');
+         $this->setflash('CODE_NOT_EXIST');
          $this->signup();
          return;
        }
-
-       $this->session->unset_userdata('PASS_NOT_MATCH');
 
        if(!$this->main_model->existingusername()){
 
-         $this->session->unset_userdata('USER_EXIST');
-
          if($this->main_model->signup()){
 
-           $userdata = array(
-             'username' => $this->input->post('user')
-           );
-           $this->session->set_userdata($userdata);
+           $_SESSION['username'] = $user;
 
            redirect(base_url(). '');
          }else{
@@ -206,14 +191,13 @@
          }
        }else{
 
-        $this->session->set_flashdata('USER_EXIST', 'TRUE');
+        $this->setflash('USER_EXIST');
         $this->signup();
         return;
 
        }
      }else{
 
-       $this->session->set_flashdata('SYNTAX_ERROR', 'TRUE');
        $this->signup();
      }
    }

@@ -10,6 +10,7 @@ $route['dashboard'] = 'main/dashboard';
 $route['join'] = 'asynch/join';
 $route['pause'] = 'asynch/pause';
 $route['resume'] = 'asynch/resume';
+$route['reset'] = 'asynch/reset';
 $route['close'] = 'asynch/close';
 $route['stop'] = 'asynch/stop';
 $route['create'] = 'asynch/create';
@@ -22,6 +23,8 @@ $route['window'] = 'main/window';
 $route['join'] = 'asynch/join';
 $route['leave'] = 'asynch/leave';
 $route['editdisplay'] = 'asynch/editdisplay';
+$route['fetchdisplay'] = 'asynch/fetchdisplay';
+$route['check_session'] = 'asynch/check_session';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST'){
 

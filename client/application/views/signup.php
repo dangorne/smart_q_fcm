@@ -11,20 +11,24 @@
           <?php echo form_open('signup') ?>
 
             <?php
-                if($this->session->userdata('USER_EXIST') == 'TRUE'){
-                  echo '<div class="alert alert-danger" role="alert"><strong>Username already exist.</strong></div>';
-                }
-                if($this->session->userdata('PASS_NOT_MATCH') == 'TRUE'){
-                  echo '<div class="alert alert-danger" role="alert"><strong>Password does not match.</strong></div>';
-                }
-                if($this->session->userdata('CODE_NOT_EXIST') == 'TRUE'){
-                  echo '<div class="alert alert-danger" role="alert"><strong>Permission Code does not exist.</strong></div>';
-                }
-              ?>
+
+              if(isset($_SESSION['USER_EXIST']) == 'TRUE'){
+
+                echo '<div class="alert alert-danger" role="alert"><strong>Username already exist.</strong></div>';
+              }
+              if(isset($_SESSION['PASS_NOT_MATCH']) == 'TRUE'){
+
+                echo '<div class="alert alert-danger" role="alert"><strong>Password does not match.</strong></div>';
+              }
+              if(isset($_SESSION['CODE_NOT_EXIST']) == 'TRUE'){
+
+                echo '<div class="alert alert-danger" role="alert"><strong>Permission Code does not exist.</strong></div>';
+              }
+            ?>
 
             <?php
 
-             if($this->session->userdata('SYNTAX_ERROR') == 'TRUE' && form_error('user') != ''){
+             if(form_error('user') != ''){
 
                echo '<div class="form-group has-error">';
                echo '<label class="control-label" for="user">Username</label>';
@@ -42,7 +46,7 @@
 
             <?php
 
-             if($this->session->userdata('SYNTAX_ERROR') == 'TRUE' && form_error('pass') != ''){
+             if(form_error('pass') != ''){
 
                echo '<div class="form-group has-error">';
                echo '<label class="control-label" for="pass">Password</label>';
@@ -60,7 +64,7 @@
 
             <?php
 
-             if($this->session->userdata('SYNTAX_ERROR') == 'TRUE' && form_error('confirmpass') != ''){
+             if(form_error('confirmpass') != ''){
 
                echo '<div class="form-group has-error">';
                echo '<label class="control-label" for="confirmpass">Confirm Password</label>';
@@ -78,7 +82,7 @@
 
             <?php
 
-             if($this->session->userdata('SYNTAX_ERROR') == 'TRUE' && form_error('code') != ''){
+             if(form_error('code') != ''){
 
                echo '<div class="form-group has-error">';
                echo '<label class="control-label" for="code">Permission Code</label>';
@@ -94,8 +98,8 @@
              }
             ?>
 
-          <button type="submit" class="btn btn-info">Sign Up</button>
-          <?php echo form_close() ?>
+           <button type="submit" class="btn btn-info">Sign Up</button>
+           <?php echo form_close() ?>
 
         </div>
 

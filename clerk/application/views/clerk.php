@@ -6,142 +6,158 @@
     $(document.body).css({'cursor' : 'pointer'});
   });
 
- $(document).ready(function(){
+  $(document).ready(function(){
 
-   var selected_list
-   var selected_table
-   var panel_toggle
+    var selected_list
+    var selected_table
+    var panel_toggle
 
-   var fetchtable = function(){
+    function fetchtable(){
 
-    var txt = $('#q-search-txt').val();
+      var txt = $('#q-search-txt').val();
 
-    if(txt == ''){
+      if(txt == ''){
 
-      $.ajax({
-        url: "<?php echo site_url('fetchtable'); ?>",
-        method: "POST",
-        dataType: "text",
-        success:function(data){
-          $('#q-tbl-body').html(data);
+        $.ajax({
 
-          var tableRow = $("#q-tbl-body td").filter(function(){
+          url: "<?php echo site_url('fetchtable'); ?>",
+          method: "GET",
+          dataType: "text",
+          success:function(data){
+
+            $('#q-tbl-body').html(data);
+
+            var tableRow = $("#q-tbl-body td").filter(function(){
+
               return $(this).text() == selected_table;
-          }).closest("tr");
+            }).closest("tr");
 
-         if(tableRow.find('td:first').text() != ''){
+            if(tableRow.find('td:first').text() != ''){
 
-           tableRow.addClass('success');
-         }else{
-           selected_table = null;
-         }
-       },
-        error:function(){
-          alert("ajax error");
-        },
-      });
+              tableRow.addClass('success');
+            }else{
 
-    }else{
+              selected_table = null;
+            }
+          },
+          error:function(){
+            alert("table empty search ajax error");
+          },
+        });
 
-      $.ajax({
-        url: "<?php echo site_url('fetchtable'); ?>",
-        method: "POST",
-        data: {search:txt},
-        dataType: "text",
-        success:function(data){
+      }else{
 
-          $('#q-tbl-body').html(data);
+        $.ajax({
 
-          var tableRow = $("#q-tbl-body td").filter(function(){
+          url: "<?php echo site_url('fetchtable'); ?>",
+          method: "POST",
+          data: {search:txt},
+          dataType: "text",
+          success:function(data){
+
+            $('#q-tbl-body').html(data);
+
+            var tableRow = $("#q-tbl-body td").filter(function(){
+
               return $(this).text() == selected_table;
-          }).closest("tr");
+            }).closest("tr");
 
-         if(tableRow.find('td:first').text() != ''){
+            if(tableRow.find('td:first').text() != ''){
 
-           tableRow.addClass('success');
-         }else{
-           selected_table = null;
-         }
-        },
-        error:function(){
-          alert("ajax error");
-        },
-      });
+              tableRow.addClass('success');
+            }else{
+              selected_table = null;
+            }
+          },
+          error:function(){
+            alert("table non empty search ajax error");
+          },
+        });
+      }
     }
-  }
 
-  fetchtable();
+    fetchtable();
 
-  var fetchqueuers = function(){
-    $.ajax({
-      url: "<?php echo site_url('fetchqueuers'); ?>",
-      method: "POST",
-      data: {selected:selected_table},
-      dataType: "text",
-      success:function(data){
-        $('#q-tbl-queuer-body').html(data);
-      },
-      error:function(){
-        alert("ajax error");
-      },
-    });
-  };
+    function fetchqueuers(){
+      $.ajax({
+        url: "<?php echo site_url('fetchqueuers'); ?>",
+        method: "POST",
+        data: {selected:selected_table},
+        dataType: "text",
+        success:function(data){
 
-   $('#q-search-txt').keyup(function(){
+          $('#q-tbl-queuer-body').html(data);
+        },
+        error:function(){
+
+          alert("fetch queuer ajax error");
+        },
+      });
+    };
+
+    $('#q-search-txt').keyup(function(){
 
       fetchtable();
     });
 
-   $('.btn-join').click(function(){
+    $('.btn-join').click(function(){
 
       if(selected_table != null){
 
         $.ajax({
-         type: "POST",
-         url: "<?php echo site_url('join'); ?>",
-         data: {selected: selected_table},
-         dataType: "json",
-         success:function(data){
+          type: "POST",
+          url: "<?php echo site_url('join'); ?>",
+          data: {selected: selected_table},
+          dataType: "json",
+          success:function(data){
 
-           if(data.res == "ONGOING"){
-             fetchtable();
-             fetchqueuers();
-           }else{
-             alert("You can't join. The queue is paused.")
-           }
-         },
-         error:function(){
-           alert("ajax error");
-         },
-       });
+            if(data['res']== 'ONGOING'){
 
-      $('.btn-join').attr("disabled", "disabled").html('<span class="glyphicon glyphicon-ban-circle"></span>');
+              fetchtable();
+              fetchqueuers();
+            }else if(data['res'] == 'PAUSED'){
 
-      setTimeout(function() {
-        $('.btn-join').removeAttr("disabled").html('JOIN!');
-      }, 5000);
+              alert("You can't join. The queue is paused.")
+            }else if(data['res'] == 'CLOSED'){
 
-     }
+              alert("You can't join. The queue is closed.")
+            }else if(data['res'] == 'UNIDENTIFIED'){
+
+              alert("You can't join. The queue does not exist.")
+            }
+          },
+          error:function(){
+            alert("join ajax error");
+          },
+        });
+
+        $('.btn-join').attr("disabled", "disabled").html('<span class="glyphicon glyphicon-ban-circle"></span>');
+
+        setTimeout(function() {
+
+          $('.btn-join').removeAttr("disabled").html('JOIN!');
+        }, 5000);
+      }
     });
 
     $('#q-tbl-body').on('click', 'tr', function(){
+
       $(this).not(".head").addClass('success').siblings().removeClass('success');
 
       selected_table=$(this).find('td:first').text();
       fetchqueuers();
     });
 
-    $(".panel-body-toggle").hide();
-
     var interval = 5000;
-    function dbUpdate(){
 
-      fetchqueuers();
+    function update(){
+
       fetchtable();
-      setTimeout(dbUpdate, interval);
+      fetchqueuers();
+      setTimeout(update, interval);
     }
 
-    setTimeout(dbUpdate, interval);
+    setTimeout(update, interval);
   });
 
  </script>

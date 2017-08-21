@@ -11,20 +11,23 @@
           <?php echo form_open('signup') ?>
 
             <?php
-                if($this->session->userdata('USER_EXIST') == 'TRUE'){
+                if(isset($_SESSION['USER_EXIST']) == 'TRUE'){
                   echo '<div class="alert alert-danger" role="alert"><strong>Username already exist.</strong></div>';
                 }
-                if($this->session->userdata('PASS_NOT_MATCH') == 'TRUE'){
+                if(isset($_SESSION['PASS_NOT_MATCH']) == 'TRUE'){
                   echo '<div class="alert alert-danger" role="alert"><strong>Password does not match.</strong></div>';
                 }
-                if($this->session->userdata('TERM_NOT_CHECK') == 'TRUE'){
+                if(isset($_SESSION['TERM_NOT_CHECK']) == 'TRUE'){
                   echo '<div class="alert alert-danger" role="alert"><strong>You must agree to the Terms and Policy.</strong></div>';
                 }
-              ?>
+                if(isset($_SESSION['ID_EXIST']) == 'TRUE'){
+                  echo '<div class="alert alert-danger" role="alert"><strong>ID Number already exist.</strong></div>';
+                }
+            ?>
 
             <?php
 
-             if($this->session->userdata('SYNTAX_ERROR') == 'TRUE' && form_error('user') != ''){
+             if(form_error('user') != ''){
 
                echo '<div class="form-group has-error">';
                echo '<label class="control-label" for="user">Username</label>';
@@ -42,7 +45,7 @@
 
             <?php
 
-             if($this->session->userdata('SYNTAX_ERROR') == 'TRUE' && form_error('pass') != ''){
+             if(form_error('pass') != ''){
 
                echo '<div class="form-group has-error">';
                echo '<label class="control-label" for="pass">Password</label>';
@@ -60,7 +63,7 @@
 
             <?php
 
-             if($this->session->userdata('SYNTAX_ERROR') == 'TRUE' && form_error('confirmpass') != ''){
+             if(form_error('confirmpass') != ''){
 
                echo '<div class="form-group has-error">';
                echo '<label class="control-label" for="confirmpass">Confirm Password</label>';
@@ -78,7 +81,7 @@
 
             <?php
 
-             if($this->session->userdata('SYNTAX_ERROR') == 'TRUE' && form_error('idnum') != ''){
+             if(form_error('idnum') != ''){
 
                echo '<div class="form-group has-error">';
                echo '<label class="control-label" for="idnum">ID Number</label>';
@@ -96,7 +99,7 @@
 
             <?php
 
-             if($this->session->userdata('SYNTAX_ERROR') == 'TRUE' && form_error('phonenum') != ''){
+             if(form_error('phonenum') != ''){
 
                echo '<div class="form-group has-error">';
                echo '<label class="control-label" for="phonenum">Phone Number</label>';
@@ -110,7 +113,7 @@
                echo '<div class="form-group">';
                echo '<label class="control-label" for="phonenum">Phone Number</label>';
                echo '<div class="input-group">';
-               echo '<span class="input-group-addon">+639</span><input type="text" name="phonenum" id="phonenum" class="form-control" value = "'.set_value('phonenum').'" aria-describedby="help">';
+               echo '<span class="input-group-addon">+63</span><input type="text" name="phonenum" id="phonenum" class="form-control" value = "'.set_value('phonenum').'" aria-describedby="help">';
                echo '</div>';
                echo '</div>';
              }

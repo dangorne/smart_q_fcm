@@ -29,7 +29,7 @@
       </div>
     </div>
   </div>
-
+  
   <div class="row">
 
     <div class="col-sm-12 col-md-4">
@@ -78,11 +78,11 @@
 
                 </div>
 
-                <div class="col-md-6">
+                <div class="col-sm-6 col-md-6">
 
                   <div class="row">
 
-                    <div class="col-md-6">
+                    <div class="col-sm-6 col-md-6">
                       <div class="media">
 
                         <div class="media-body">
@@ -102,7 +102,7 @@
                       </div>
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-sm-6 col-md-6">
                       <div class="media">
 
                         <div class="media-body">
@@ -178,5 +178,5 @@
       </div>
     </div>
 
-  </div>
+
 </div>

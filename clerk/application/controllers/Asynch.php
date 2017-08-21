@@ -6,23 +6,36 @@
 
       parent::__construct();
 
-      $this->load->library('session');
-      $this->load->model('main_model');
-      $this->load->helper('url_helper');
+      $this->load
+        ->library('session')
+        ->model('main_model')
+        ->helper('url_helper');
+    }
 
+    public function getpost($key, $type = 'NULL'){
+
+      $data = $this->input->post($key);
+
+      if(empty($data) && $type == 'NOT_NULL_STR'){
+
+        return 'NONE';
+      }
+
+      if(empty($data) && $type == 'NOT_NULL_NUM'){
+
+        return 0;
+      }
+
+      return $data;
     }
 
     public function fetchtable(){
 
-      $var = $this->input->post('search');
+      $var = $this->getpost('search');
 
-      if($var == '' or !is_null($var)){
-        $search_result = $this->main_model->getsearchresult($this->input->post('search'), TRUE);
-      }else{
-        $search_result = $this->main_model->getsearchresult();
-      }
+      $result = $this->main_model->getsearchresult($var);
 
-      foreach ($search_result as $row){
+      foreach ($result as $row){
         echo '<tr>';
         echo '<td>'.$row->queue_name.'</td>';
         echo '<td>'.$row->serving_atNo.'</td>';
@@ -36,25 +49,12 @@
       }
     }
 
-    public function fetchlist(){
-
-      $search_result = $this->main_model->getList();
-
-      foreach ($search_result as $row)
-      {
-
-        echo '<div class="list-group-item list-selected">';
-        echo '<span class="list-qname"><strong>'.$row->queue_name.'</strong></span>';
-        echo '<span class="badge badge-total">'.$row->queue_number.'</span>';
-        echo '</div>';
-      }
-    }
-
     public function fetchqueuers(){
 
-      $search_result = $this->main_model->fetchqueuers($this->input->post('selected'));
+      $result = $this->main_model->fetchqueuers($_SESSION['username'], $this->getpost('selected'));
 
-      foreach ($search_result as $row){
+      foreach ($result as $row){
+
         echo '<tr>';
         echo '<td>'.date('h:i:s A, l - d M Y', strtotime($row->join_time)).'</td>';
         echo '<td>'.$row->queue_number.'</td>';
@@ -64,7 +64,7 @@
 
     public function join(){
 
-      echo json_encode(array('res' => $this->main_model->join($this->input->post('selected'))));
+      echo json_encode(array('res' => $this->main_model->join($_SESSION['username'], $this->input->post('selected'))));
     }
   }
 

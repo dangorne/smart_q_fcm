@@ -1,156 +1,195 @@
 <?php
 class Main_model extends CI_Model {
 
-  public function __construct()
-  {
+  public function __construct(){
+
     $this->load->database();
   }
 
-  public function existingusername(){
+  //ok
+  public function existingusername($user, $type){
 
-    $this->db->where('username', $this->input->post('user'));
-    if($this->db->count_all_results('clerk') == 1){
+    $result = $this->db
+      ->where('username', $user)
+      ->count_all_results($type);
+
+    if($result == 1){
       return TRUE;
     }
 
     return FALSE;
 	}
 
-  public function correctpassword(){
+  //ok
+  public function correctpassword($user, $pass, $type){
 
-    $this->db->where('username', $this->input->post('user'));
-    $this->db->where('password', $this->input->post('pass'));
+    $result = $this->db
+      ->where('username', $user)
+      ->where('password', $pass)
+      ->count_all_results($type);
 
-    if($this->db->count_all_results('clerk') == 1){
+    if($result == 1){
+
       return TRUE;
     }
 
     return FALSE;
   }
 
-  public function existingcode($user_type, $code){
+  //ok
+  public function existingcode($code, $type){
 
-    if($user_type == "client"){
+    $result = $this->db
+      ->query("SELECT * FROM " .$type.'_code'. " WHERE BINARY code = ".$this->db->escape($code)."")
+      ->num_rows();
 
-      $this->db->where('code', $code);
-
-      if($this->db->count_all_results('permission_code') == 1){
-        return TRUE;
-      }
-    }else if($user_type == "clerk"){
-
-      $this->db->where('code', $code);
-
-      if($this->db->count_all_results('clerk_code') == 1){
-        return TRUE;
-      }
+    if($result == 1){
+      return TRUE;
     }
 
     return FALSE;
   }
 
-	public function signup(){
-		$this->load->helper('url');
+  //ok
+	public function signup($user, $pass, $code, $type){
 
-    if($this->existingusername()){
+    if($this->existingusername($user, $type)){
+
       return FALSE;
     }
 
-    if(!$this->existingcode("clerk", $this->input->post('code'))){
+    if(!$this->existingcode($code, $type)){
+
       return FALSE;
     }
 
-    $this->db->reset_query();
-
-		$data = array(
-			'username' => $this->input->post('user'),
-			'password' => $this->input->post('pass'),
-		);
-
-		$this->db->insert('clerk', $data);
+		$this->db->insert($type, array(
+			'username' => $user,
+			'password' => $pass,
+		));
 
     return TRUE;
 	}
 
   public function getsearchresult($match){
 
-   if($match != ''){
+    if(!empty($match)){
 
-     $this->db->like('queue_name', $match)
-       ->group_start()
-       ->where('life', 1)
-       ->or_where('life', 2)
-       ->group_end();
+      $result = $this->db
+        ->like('queue_name', $match)
+        ->group_start()
+        ->where('life', 1)
+        ->or_where('life', 2)
+        ->or_where('life', 3)
+        ->group_end()
+        ->get('client_transaction')
+        ->result();
 
-     return $this->db->get('client_transaction')->result();
-   }
+      return $result;
+    }
 
-   $this->db->where('life', 1);
-   $this->db->or_where('life', 2);
-   return $this->db->get('client_transaction')->result();
+    $result = $this->db
+      ->where('life', 1)
+      ->or_where('life', 2)
+      ->or_where('life', 3)
+      ->get('client_transaction')
+      ->result();
+
+    return $result;
   }
 
-  public function fetchqueuers($queue){
+  //ok
+  public function fetchqueuers($user, $queue){
 
-    $this->db->where('id_number', 'walk-in');
-    $this->db->where('queue_name', $queue);
-    $this->db->where('clerk_userName', $this->session->userdata['username']);
+    $result = $this->db
+      ->where('id_number', 'walk-in')
+      ->where('queue_name', $queue)
+      ->where('clerk_userName', $user)
+      ->get('queuer')
+      ->result();
 
-    return $this->db->get('queuer')->result();
+    return $result;
   }
 
+  //ok
   public function incrementedlastnumber($queue){
 
-    $this->db->where('queue_name', $queue);
-    $this->db->set('total_deployNo', 'total_deployNo+1', FALSE);
-    $this->db->update('client_transaction');
+    $increment = $this->db
+      ->where('queue_name', $queue)
+      ->set('total_deployNo', 'total_deployNo+1', FALSE)
+      ->update('client_transaction');
 
-    $this->db->reset_query();
+    if(empty($increment)){
 
-    $this->db->where('queue_name', $queue);
-    $var = $this->db->get('client_transaction')->row();
+      return 0;
+    }
 
-    return $var->total_deployNo;
+    $result = $this->db
+      ->where('queue_name', $queue)
+      ->get('client_transaction')
+      ->row();
+
+    if(empty($result)){
+
+      return 0;
+    }
+
+    return $result->total_deployNo;
   }
 
+  //ok
   public function getstatus($queue){
 
-    $this->db->where('queue_name', $queue);
+    $result = $this->db
+      ->where('queue_name', $queue)
+      ->get('client_transaction')
+      ->row();
 
-    $var = $this->db->get('client_transaction')->row();
+    if(empty($result)){
 
-    if($var->life == 1){
-      return 'ONGOING';
-    }else if ($var->life == 2){
-      return 'PAUSED';
-    }else if ($var->life == 3){
-      return 'CLOSED';
-    }else{
-      return 'UNIDENTIFIED';
+      return 'UNDEFINED';
     }
+
+    if($result->life == 1){
+
+      return 'ONGOING';
+    }else if ($result->life == 2){
+
+      return 'PAUSED';
+    }else if ($result->life == 3){
+
+      return 'CLOSED';
+    }
+
+    return 'UNDEFINED';
   }
 
-  public function join($queue){
+  //ok
+  public function join($user, $queue){
 
     date_default_timezone_set('Asia/Manila');
 
-    if($this->getstatus($queue) == "ONGOING"){
+    if($this->getstatus($queue) == 'ONGOING'){
 
-      $data = array(
-   			 'id_number' => 'walk-in',
-         'queue_name' => $queue,
-   			 'queue_number' => $this->incrementedlastnumber($queue),
-         'clerk_userName' => $this->session->userdata['username'],
-         'join_time' => date('Y-m-d H:i:s'),
-         'join_type' => 'web',
-   		);
+      $this->db->insert('queuer', array(
+        'id_number' => 'walk-in',
+        'queue_name' => $queue,
+        'queue_number' => $this->incrementedlastnumber($queue),
+        'clerk_userName' => $user,
+        'join_time' => date('Y-m-d H:i:s'),
+        'join_type' => 'web',
+   		));
 
-      $this->db->insert('queuer', $data);
+      return 'ONGOING';
+    }else if($this->getstatus($queue) == 'PAUSED'){
 
-      return "ONGOING";
-    }else{
+      return 'PAUSED';
+    }else if($this->getstatus($queue) == 'CLOSED'){
 
-      return "PAUSED";
+      return 'CLOSED';
+    }else if($this->getstatus($queue) == 'UNDEFINED'){
+
+      return 'UNDEFINED';
     }
  	}
 

@@ -8,18 +8,18 @@ $(document).ajaxStart(function() {
 
 $(document).ready(function(){
 
-  var fetchwindow = function(){
+  //ok
+  function fetchwindow(){
 
     $.ajax({
       url: "<?php echo site_url('fetchwindow'); ?>",
       method: "GET",
       dataType: "text",
       success:function(data){
-        $('.window-table').html(data);
-
+          $('.window-table').html(data);
       },
       error:function(data){
-       alert("ajax error");
+       alert("table fetch ajax error");
       },
     });
   }

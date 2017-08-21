@@ -12,6 +12,7 @@ $route['fetchpanel'] = 'asynch/fetchpanel';
 $route['fetchlist'] = 'asynch/fetchlist';
 $route['fetchsubdetail'] = 'asynch/fetchsubdetail';
 $route['savesubdetail'] = 'asynch/savesubdetail';
+$route['check_session'] = 'asynch/check_session';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST'){
 
