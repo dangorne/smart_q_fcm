@@ -9,6 +9,11 @@
 	</head>
 
 	<nav class="navbar navbar-default">
+		<?php
+			echo "<pre>";
+			print_r ($this->session->all_userdata());
+			echo "</pre>";
+	 	?>
 	  <div class="container-fluid">
 	    <div class="navbar-header">
 	      <a class="navbar-brand glyphicon glyphicon-flag" href="<?php echo site_url(''); ?>">  SmartQueue</a>

@@ -153,7 +153,24 @@
     //little validation
     public function create(){
 
-      echo json_encode(array('Result' => $this->main_model->create()));
+      $create = $this->main_model->create();
+      $row = $this->main_model->fetchqueue();
+      if(!empty($row) && $create == 'CREATED'){
+        echo json_encode(array(
+          'Result' => $create,
+          'qname' => $row->queue_name,
+          'code' => $row->queue_code,
+          'seats' => $row->seats_offered,
+          'desc' => $row->queue_description,
+          'req' => $row->requirements,
+          'venue' => $row->venue,
+          'rest' => $row->queue_restriction,
+        ));
+      }else{
+        echo json_encode(array(
+          'Result' => $create,
+        ));
+      }
     }
 
     //ok
@@ -184,9 +201,17 @@
     public function next(){
 
       if($this->main_model->getcurrentservicenum() < $this->main_model->getdeployno()){
-        echo json_encode(array('servicenum' => $this->main_model->incrementcurrent(), 'idnum' => $this->main_model->incrementid()));
+        echo json_encode(array(
+          'servicenum' => $this->main_model->incrementcurrent(),
+          'idnum' => $this->main_model->incrementid(),
+          'qname' => $this->main_model->getqueuename(),
+          'max' => FALSE));
       }else{
-        echo json_encode(array('servicenum' => $this->main_model->getcurrentservicenum(), 'idnum' => $this->main_model->getcurrentid()));
+        echo json_encode(array(
+          'servicenum' => $this->main_model->getcurrentservicenum(),
+          'idnum' => $this->main_model->getcurrentid(),
+          'qname' =>$this->main_model->getqueuename(),
+          'max' => TRUE));
       }
     }
 

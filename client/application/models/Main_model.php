@@ -281,6 +281,17 @@ class Main_model extends CI_Model {
   }
 
   //ok
+  public function fetchqueue(){
+
+    $result = $this->db
+      ->where('queue_name', $this->input->post('input')['name'])
+      ->get('client_transaction')
+      ->row();
+
+    return $result;
+  }
+
+  //ok
   public function getqueuename(){
 
     $result = $this->db

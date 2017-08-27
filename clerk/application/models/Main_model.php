@@ -104,6 +104,7 @@ class Main_model extends CI_Model {
     $result = $this->db
       ->where('id_number', 'walk-in')
       ->where('queue_name', $queue)
+      ->where('queuer_state', 'in')
       ->where('clerk_userName', $user)
       ->get('queuer')
       ->result();

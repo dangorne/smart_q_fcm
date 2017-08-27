@@ -38,6 +38,18 @@
       return $data;
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
     public function index(){
 
       if(isset($_SESSION['username'])){
@@ -48,6 +60,31 @@
         redirect('login');
       }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public function dashboard(){
 

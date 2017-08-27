@@ -1,3 +1,7 @@
+<script
+  src="https://www.gstatic.com/firebasejs/4.2.0/firebase.js">
+</script>
+
 <script type="text/javascript" language="javascript">
 
 $(document).ajaxStart(function() {
@@ -7,6 +11,16 @@ $(document).ajaxStart(function() {
   });
 
 $(document).ready(function(){
+
+  //initialization
+  var config = {
+    apiKey: "AIzaSyBEmflQP-ddGQ1pxtSq4BD-OkJSIaOq6_4",
+    authDomain: "fcmfirebaseproject-23b00.firebaseapp.com",
+    databaseURL: "https://fcmfirebaseproject-23b00.firebaseio.com/",
+    storageBucket: "gs://fcmfirebaseproject-23b00.appspot.com"
+  };
+
+  firebase.initializeApp(config);
 
   var create_input = {};
   var selected_list
@@ -46,6 +60,7 @@ $(document).ready(function(){
       },
     });
   }
+
   //ok
   $('#editDisplay').click(function(){
 
@@ -243,6 +258,7 @@ $(document).ready(function(){
       name:$('#create-name').val(),
       code:$('#create-code').val(),
       seat:$('#create-seat').val(),
+      desc:$('#create-desc').val(),
       venue:$('#create-venue').val(),
       req:$('#create-req').val(),
       venue:$('#create-venue').val(),
@@ -253,10 +269,22 @@ $(document).ready(function(){
        url: "<?php echo site_url('create'); ?>",
        method: "POST",
        data: {input: input},
-       dataType: "text",
+       dataType: "json",
        success:function(data){
          if(data.Result === 'CREATED'){
            fetchlist();
+           firebase.database().ref('queue/'+data.qname).set({
+             name:data.qname,
+             code:data.code,
+             description:data.desc,
+             requirement:data.req,
+             venue:data.venue,
+             restriction:data.rest,
+             seat:data.seats,
+             current:0,
+             total: 0,
+             status:'ONGOING',
+           });
          }else if(data.Result === 'EXISTING'){
            alert("Queue name already exists!")
          }else if(data.Result === 'ERROR'){
@@ -340,6 +368,7 @@ $(document).ready(function(){
 
   //ok
   $('.btn-next').click(function(){
+
     $.ajax({
       type: 'GET',
       url: "<?php echo site_url('next'); ?>",
@@ -349,9 +378,21 @@ $(document).ready(function(){
 
         $('.queue-num').html(data['servicenum']);
         $('.id-num').html(data['idnum']);
+        if(!data['max']){
+          var addCurrentRef = firebase.database().ref('queue/'+data['qname']+'/current');
+          addCurrentRef.transaction(function(current) {
+            return current + 1;
+          });
+          var addTotalRef = firebase.database().
+          ref('queue/'+data['qname']+'/total');
+          addTotalRef.transaction(function(total) {
+            return total + 1;
+          });
+        }
       }
     });
 
+    //disable the next btn and change its icon to ban cirlce
     $('.btn-next').attr("disabled", "disabled");
     $('.btn-success-glyph').removeClass("glyphicon glyphicon-forward").addClass("glyphicon glyphicon-ban-circle");
 

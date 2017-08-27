@@ -1,0 +1,26 @@
+<html>
+<script 
+src="https://www.gstatic.com/firebasejs/4.2.0/firebase.js">
+</script>
+
+<script>
+  var config = {
+    apiKey: "AIzaSyBEmflQP-ddGQ1pxtSq4BD-OkJSIaOq6_4",
+    authDomain: "fcmfirebaseproject-23b00.firebaseapp.com",
+    databaseURL: "https://fcmfirebaseproject-23b00.firebaseio.com/",
+    storageBucket: "gs://fcmfirebaseproject-23b00.appspot.com"
+  };
+  var defaultApp = firebase.initializeApp(config);
+
+  console.log(defaultApp.name);  
+  
+  var database = firebase.database();
+ 
+  var addCurrentRef = firebase.database().ref('CASHIER');
+  addCurrentRef.transaction(function(current) {
+
+    return current + 1;
+  });
+  
+</script>
+</html>
